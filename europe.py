@@ -1,4 +1,37 @@
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
+import argparse
+import sys
+
+############################
+#
+#  ARGUMENT PARSING 
+#
+############################
+
+parser = argparse.ArgumentParser(description='CSV generation with name;point;country querying dbpedia')
+
+parser.add_argument('--query', action='store', dest='querystring', default=None,
+                    help='Query')
+
+parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
+                    help='File out. [default dbpedia.csv]')
+
+parser.add_argument('--verbose', action='store_true', default=False,
+                    dest='debug_bool',
+                    help='Verbose output')
+
+arguments  = parser.parse_args()
+
+############################
+#
+#  INITIALIZATIONS
+#
+############################
+query = arguments.querystring
+OF = arguments.fileout
+isdebug = arguments.debug_bool
+RESULTS_QUERY = 10000
+
 
 sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setReturnFormat(JSON)
@@ -18,8 +51,8 @@ SELECT ?place WHERE {
 
 results = sparql.query().convert()
 
-header = "name;WKT;Country"
-print header
+header = "name;WKT;Country\n"
+OF.write(header)
 
 for country in results["results"]["bindings"]:
     country_uri = country["place"]["value"]
@@ -28,6 +61,7 @@ for country in results["results"]["bindings"]:
     offset = 0
     
     while total_results > 0:
+        if isdebug: print country_uri, offset
         try:
             sparql.setQuery("""
               SELECT ?title (MIN(?geolat) AS ?geolat) (MIN(?geolong) AS ?geolong)
@@ -40,18 +74,24 @@ for country in results["results"]["bindings"]:
               }
               GROUP BY ?title
               OFFSET """ + str(offset) + """
-              LIMIT 1000
+              LIMIT """ + str(RESULTS_QUERY)+ """
             """)
 
             country_results = sparql.query().convert()
 
             for result in country_results["results"]["bindings"]:
-                print(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + country_name)
+                OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + country_name + "\n")
         
             total_results = len(country_results["results"]["bindings"])
-            offset = offset + 10000
+            offset = offset + RESULTS_QUERY
     
         except Exception as inst:
             print type(inst)
             print "EXCEPTION"
 
+############################
+#
+#  CLOSURE
+#
+############################
+OF.close()
