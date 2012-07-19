@@ -1,7 +1,9 @@
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
 import sys
-
+import threading
+import time
+import cSpinner
 
 ############################
 #
@@ -22,6 +24,7 @@ parser.add_argument('--verbose', action='store_true', default=False,
                     help='Verbose output')
 
 arguments  = parser.parse_args()
+
 
 ############################
 #
@@ -54,17 +57,27 @@ for country in results["results"]["bindings"]:
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
 
+#Spinner
+S = cSpinner.cSpinner()
+S.start()
+
+############################
+#
+#  START
+#
+############################
+
 header = "name;WKT;Country;Abstract\n"
 OF.write(header)
 
 for country in results["results"]["bindings"]:
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
-    total_results = 1
+    total_results = 0 
+    query_results = 1
     offset = 0
     
-    while total_results > 0:
-        if isdebug: print country_uri, offset
+    while query_results > 0:
         try:
             sparql.setQuery("""
                 SELECT ?title,?geolat,?geolong,?abstract
@@ -86,12 +99,15 @@ for country in results["results"]["bindings"]:
             for result in country_results["results"]["bindings"]:
                 OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + country_name + ";"+result["abstract"]["value"].encode('ascii','ignore')+"\n")
         
-            total_results = len(country_results["results"]["bindings"])
+            query_results = len(country_results["results"]["bindings"])
             offset = offset + RESULTS_QUERY
+            total_results += query_results
     
         except Exception as inst:
             print type(inst)
             print "EXCEPTION"
+
+    if isdebug: print country_uri, total_results
 
 ############################
 #
@@ -99,3 +115,4 @@ for country in results["results"]["bindings"]:
 #
 ############################
 OF.close()
+S.stop()
