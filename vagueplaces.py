@@ -3,7 +3,9 @@ import argparse
 import sys
 import threading
 import time
+import signal 
 import cSpinner
+from libs import heatmap
 
 ############################
 #
@@ -61,6 +63,31 @@ for country in results["results"]["bindings"]:
 S = cSpinner.cSpinner()
 S.start()
 
+
+############################
+#
+#  FUNCTIONS
+#
+############################
+def gen_heatmap():
+    pass
+
+def finish_program():
+    OF.close()
+    S.stop()
+    sys.exit(0)
+
+############################
+#
+#  SIGNAL HANDLING
+#
+############################
+def kill_handler(signal, frame):
+    print 'Kill Signal Recieved'
+    finish_program()
+
+signal.signal(signal.SIGINT, kill_handler)
+
 ############################
 #
 #  START
@@ -114,5 +141,4 @@ for country in results["results"]["bindings"]:
 #  CLOSURE
 #
 ############################
-OF.close()
-S.stop()
+finish_program()
