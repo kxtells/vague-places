@@ -16,6 +16,10 @@ parser = argparse.ArgumentParser(description='CSV generation with name;point;cou
 parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
                     help='File out. [default dbpedia.csv]')
 
+parser.add_argument('--live', action='store_true',default=False,
+                    dest='live_bool',
+                    help='Use Dbpedia live SPARQL endpoint instead of last released version')
+
 arguments  = parser.parse_args()
 
 
@@ -73,30 +77,29 @@ class cSpinner(threading.Thread):
 #
 ############################
 OF = arguments.fileout
+islive = arguments.live_bool
 RESULTS_QUERY = 20000 
 
-sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+if islive:
+    sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
+else:
+    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+
 sparql.setReturnFormat(JSON)
 
 #Spinner
 S = cSpinner()
-S.start()
-S.set_total(585801); #as DbPedia 3.6
-
-# Query to get the total count
-#SELECT COUNT(*)
-#WHERE{
-#  ?place rdf:type dbpedia-owl:Place .
-#  ?place foaf:name ?title .
-#  ?place geo:lat ?geolat .
-#  ?place geo:long ?geolong .
-#}
 
 ############################
 #
 #  FUNCTIONS
 #
 ############################
+def finish_program():
+    OF.close()
+    S.stop()
+    sys.exit(0)
+
 def wait_to_continue():
     S.pause()
     
@@ -108,10 +111,36 @@ def wait_to_continue():
 
     S.resume()
 
-def finish_program():
-    OF.close()
-    S.stop()
-    sys.exit(0)
+def get_total_dbpedia_points(islive):
+    """ Count the total number of dbpedia points """
+
+    try:
+        if islive:
+            sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
+        else:
+            sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+        
+        sparql.setReturnFormat(JSON)
+
+        sparql.setQuery("""
+                        SELECT (COUNT(*) AS ?count)
+                        WHERE{
+                          ?place rdf:type dbpedia-owl:Place .
+                          ?place foaf:name ?title .
+                          ?place geo:lat ?geolat .
+                          ?place geo:long ?geolong .
+                        }
+                """)
+
+        results_array = sparql.query().convert()
+
+        total = results_array["results"]["bindings"][0]["count"]["value"]
+        return total
+
+    except:
+        print "\n Error on counting total number"
+        finish_program()
+
 
 ############################
 #
@@ -130,6 +159,10 @@ signal.signal(signal.SIGINT, kill_handler)
 #
 ############################
 
+print "Counting total entries"
+S.set_total(get_total_dbpedia_points(islive));
+S.start()
+
 header = "name;WKT\n"
 OF.write(header)
 
@@ -140,7 +173,7 @@ offset = 0
 while query_results > 0:
     try:
         sparql.setQuery("""
-            SELECT ?title,?geolat,?geolong,?abstract
+            SELECT ?title,?geolat,?geolong
             WHERE{
               ?place rdf:type dbpedia-owl:Place .
               ?place foaf:name ?title .
@@ -154,9 +187,9 @@ while query_results > 0:
         results_array = sparql.query().convert()
         for result in results_array["results"]["bindings"]:
             OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n")
-    
+   
         query_results = len(results_array["results"]["bindings"])
-        offset = offset + RESULTS_QUERY
+        offset = offset + query_results
         total_results += query_results
         S.set_count(total_results) #set spinner count
 
@@ -171,4 +204,5 @@ while query_results > 0:
 #  CLOSURE
 #
 ############################
+print "Program Finished"
 finish_program()
