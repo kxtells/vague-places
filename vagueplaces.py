@@ -21,6 +21,10 @@ parser.add_argument('--query', action='store', dest='querystring', default=None,
 parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
                     help='File out. [default dbpedia.csv]')
 
+parser.add_argument('--live', action='store_true',default=False,
+                    dest='live_bool',
+                    help='Use Dbpedia live SPARQL endpoint instead of last released version')
+
 parser.add_argument('--verbose', action='store_true', default=False,
                     dest='debug_bool',
                     help='Verbose output')
@@ -36,9 +40,14 @@ arguments  = parser.parse_args()
 query = arguments.querystring
 OF = arguments.fileout
 isdebug = arguments.debug_bool
+islive = arguments.live_bool
 RESULTS_QUERY = 500000
 
-sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+if islive:
+    sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
+else:
+    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+
 sparql.setReturnFormat(JSON)
 
 sparql.setQuery("""
