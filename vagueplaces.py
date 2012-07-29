@@ -112,7 +112,6 @@ for country in results["results"]["bindings"]:
     total_results = 0 
     query_results = 1
     offset = 0
-    
     while query_results > 0:
         try:
             sparql.setQuery("""
@@ -129,14 +128,14 @@ for country in results["results"]["bindings"]:
                 OFFSET """ + str(offset) + """
                 LIMIT """ + str(RESULTS_QUERY)+ """
                 """)
-
+            
             country_results = sparql.query().convert()
-
+            
             for result in country_results["results"]["bindings"]:
                 OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + country_name + ";"+result["abstract"]["value"].encode('ascii','ignore')+"\n")
         
             query_results = len(country_results["results"]["bindings"])
-            offset = offset + RESULTS_QUERY
+            offset = offset + query_results
             total_results += query_results
     
         except Exception as inst:
