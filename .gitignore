@@ -1,3 +1,18 @@
+#
+#
+#
+# VIM
+#
+#
+*.swp
+*.swo
+
+#
+#
+#
+#PYTHON
+#
+#
 *.py[co]
 
 # Packages
@@ -27,7 +42,10 @@ pip-log.txt
 .mr.developer.cfg
 
 #
-#For C++ alpha_shaper
+#
+#
+# ALPHA SHAPER
+#
 #
 # Compiled Object files
 *.slo
