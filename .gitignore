@@ -25,3 +25,26 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#
+#For C++ alpha_shaper
+#
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+#CMAKE
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
