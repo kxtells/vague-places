@@ -3,13 +3,14 @@ import argparse
 import sys
 import threading
 import time
-import signal 
+import signal
 import cSpinner
+import cPlace
 from libs import heatmap
 
 ############################
 #
-#  ARGUMENT PARSING 
+#  ARGUMENT PARSING
 #
 ############################
 
@@ -54,7 +55,7 @@ sparql.setQuery("""
                 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 PREFIX yago: <http://dbpedia.org/class/yago/>
                 PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-                
+
                 SELECT ?place WHERE {
                     ?place rdf:type yago:EuropeanCountries .
                     ?place rdf:type dbpedia-owl:Country
@@ -105,11 +106,12 @@ signal.signal(signal.SIGINT, kill_handler)
 
 header = "name;WKT;Country;Abstract\n"
 OF.write(header)
+PLACES = []
 
 for country in results["results"]["bindings"]:
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
-    total_results = 0 
+    total_results = 0
     query_results = 1
     offset = 0
     while query_results > 0:
@@ -128,16 +130,22 @@ for country in results["results"]["bindings"]:
                 OFFSET """ + str(offset) + """
                 LIMIT """ + str(RESULTS_QUERY)+ """
                 """)
-            
+
             country_results = sparql.query().convert()
-            
+
             for result in country_results["results"]["bindings"]:
+                title = result["title"]["value"].encode('ascii','ignore')
+                lat = result ["geolat"]["value"]
+                lon = result["geolong"]["value"]
+                country = country_name
+                abstract = result["abstract"]["value"].encode('ascii','ignore')
                 OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + country_name + ";"+result["abstract"]["value"].encode('ascii','ignore')+"\n")
-        
+                PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
+
             query_results = len(country_results["results"]["bindings"])
             offset = offset + query_results
             total_results += query_results
-    
+
         except Exception as inst:
             print type(inst)
             print "EXCEPTION"
