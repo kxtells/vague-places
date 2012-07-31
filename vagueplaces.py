@@ -19,6 +19,9 @@ parser = argparse.ArgumentParser(description='CSV generation with name;point;cou
 parser.add_argument('--query', action='store', dest='querystring', default=None,
                     help='Query to filter from the Abstract results')
 
+parser.add_argument('--format', action='store', dest='formatstring', default='csv',
+                    help='Format of the output file [csv,cgal]. default is csv')
+
 parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
                     help='File out. [default dbpedia.csv]')
 
@@ -39,6 +42,7 @@ arguments  = parser.parse_args()
 #
 ############################
 query = arguments.querystring
+oformat = arguments.formatstring
 OF = arguments.fileout
 isdebug = arguments.debug_bool
 islive = arguments.live_bool
@@ -93,9 +97,9 @@ def write_file_cgal(fileh):
     """ 
         Writes a file to be read by cgal alpha_shape generator 
     """
-    fileh.write(len(PLACES))
+    fileh.write(str(len(PLACES))+"\n")
     for p in PLACES:
-        fileh.write(p.lat+" "+p.lon)
+        fileh.write(p.lat+" "+p.lon+"\n")
 
 def write_file_csv(fileh):
     """ 
@@ -111,9 +115,9 @@ def write_file(fileh,wf):
     """ 
         Write a file (fileh) with the format (wf). Accepting csv and cgal
     """
-    if wf == 'cgal':
+    if wf.lower() == 'cgal':
         write_file_cgal(fileh)
-    elif wf == 'csv':
+    elif wf.lower() == 'csv':
         write_file_csv(fileh)
 
 ############################
@@ -182,7 +186,7 @@ for country in results["results"]["bindings"]:
 #  FILE WRITING
 #
 ############################
-write_file(OF,'csv')
+write_file(OF,oformat)
 
 ############################
 #
