@@ -1,7 +1,9 @@
 /***********************************************************************
 
-Takes a list of points and returns a list of segments corresponding to the
-Alpha shape.
+Takes a list of points and returns a CSV with the correspondent linestrings.
+
+
+[-p] -> Returns the points of the edge
 
 ************************************************************************/
 
@@ -101,12 +103,61 @@ file_input(OutputIterator out)
 //------------------ functions --------------------------------------
 
 /**
-  This function tries to obtain an ordered list of the segments to form a polygon
+  This function tries to obtain an ordered list of the segments to form a polygon.
 */
 void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
 
-  for(std::vector<Segment>::iterator it = segments.begin(); it != segments.end();++it){
+  Segment cs;
+  bool found = false;
+  int pid = 0; //polygon id (possible alpha shape with different polygons)
+  int count = 0;
+  //std::vector<Segment> osegments;
+  std::vector<Segment> osegments [255]; //initialize at 255. not more
+  std::vector<Segment> segments_tmp;
+
+  for(int i = 0; i < segments.size();i++){
+    segments_tmp.push_back(segments[i]);
+  }
+
+  //push a first segment
+  osegments[pid].push_back(segments_tmp.back());
+  segments_tmp.pop_back(); //remove the element
   
+  while(segments_tmp.size() > 0){
+    cs = osegments[pid].back();
+    found = false;
+
+    for(std::vector<Segment>::iterator it = segments_tmp.begin(); 
+        !found && it != segments_tmp.end();
+        ++it){
+        
+        if (cs.target() == it->source()){
+          std::cout << "bingo " << cs.target() << " " << it->source() << std::endl;
+          found = true;
+          osegments[pid].push_back(*it);
+          segments_tmp.erase(it);
+        }
+    }
+
+    if (!found){
+      /*if not found. I assume that there is another polygon.
+        Increase polygon id (pid) and keep going.
+      */
+      std::cout << "NObingo " << cs.target() << std::endl;
+      ++pid;
+      osegments[pid].push_back(segments_tmp.back());
+      segments_tmp.pop_back();
+    }
+  }
+
+  for(int i=0;i<255;i++){
+    std::cout << "POLYGON(";
+    std::vector<Segment>::iterator it = osegments[i].begin();
+    std::cout << it->source() << ",";
+    for(std::vector<Segment>::iterator it = osegments[i].begin(); it != osegments[i].end();++it,++count){
+      std::cout << it->target() << ",";
+    }
+    std::cout << ")" << std::endl;
   }
 }
 
@@ -148,6 +199,7 @@ int main(int argc, char* argv[])
 
     std::cout << bpoints << std::endl;
 
+  //File Input
   std::list<Point> points;
 
   if(! file_input(std::back_inserter(points))){
@@ -177,5 +229,8 @@ int main(int argc, char* argv[])
   else{
     toWKT_segments(segments,A);
   }
+ 
+  toWKT_polygon(segments,A);
+ 
   return 0;
 }
