@@ -43,7 +43,9 @@ OF = arguments.fileout
 isdebug = arguments.debug_bool
 islive = arguments.live_bool
 RESULTS_QUERY = 500000
+PLACES = []
 
+# Europe Country List
 if islive:
     sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
 else:
@@ -87,6 +89,33 @@ def finish_program():
     S.stop()
     sys.exit(0)
 
+def write_file_cgal(fileh):
+    """ 
+        Writes a file to be read by cgal alpha_shape generator 
+    """
+    fileh.write(len(PLACES))
+    for p in PLACES:
+        fileh.write(p.lat+" "+p.lon)
+
+def write_file_csv(fileh):
+    """ 
+        Writes a CSV file to be opened by a GIS software. WKT 
+    """
+    header = "name;WKT;Country;Abstract\n"
+    fileh.write(header)
+
+    for p in PLACES:
+        fileh.write(p.name+"; POINT("+p.lon+" "+p.lat+");"+p.country+";"+p.text)
+
+def write_file(fileh,wf):
+    """ 
+        Write a file (fileh) with the format (wf). Accepting csv and cgal
+    """
+    if wf == 'cgal':
+        write_file_cgal(fileh)
+    elif wf == 'csv':
+        write_file_csv(fileh)
+
 ############################
 #
 #  SIGNAL HANDLING
@@ -104,9 +133,6 @@ signal.signal(signal.SIGINT, kill_handler)
 #
 ############################
 
-header = "name;WKT;Country;Abstract\n"
-OF.write(header)
-PLACES = []
 
 for country in results["results"]["bindings"]:
     country_uri = country["place"]["value"]
@@ -139,7 +165,6 @@ for country in results["results"]["bindings"]:
                 lon = result["geolong"]["value"]
                 country = country_name
                 abstract = result["abstract"]["value"].encode('ascii','ignore')
-                OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + country_name + ";"+result["abstract"]["value"].encode('ascii','ignore')+"\n")
                 PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
 
             query_results = len(country_results["results"]["bindings"])
@@ -151,6 +176,13 @@ for country in results["results"]["bindings"]:
             print "EXCEPTION"
 
     if isdebug: print country_uri, total_results
+
+############################
+#
+#  FILE WRITING
+#
+############################
+write_file(OF,'csv')
 
 ############################
 #
