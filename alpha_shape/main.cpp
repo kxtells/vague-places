@@ -255,6 +255,9 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
 
 }
 
+/**
+* Prints a csv list of the Alpha shape segments
+*/
 void toWKT_segments(std::vector<Segment> segments, const Alpha_shape_2& A){
 
   std::cout << "id;wkt" << std::endl;
