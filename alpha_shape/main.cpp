@@ -144,6 +144,7 @@ Prints a polygon in its WKT form
 Does not add POLYGON text. It is used inside other printing functions
 */
 void print_WKT_polygon_2(Polygon_2 plg){
+ 
   
   std::cout << "(";
   std::vector<Point>::iterator v;
@@ -210,7 +211,6 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
     }
     polygons.push_back(P);
   }
-
 }
 
 /**
@@ -219,12 +219,27 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
 * NOTE: if a polygon is inside another polygon is treated as a hole
 */
 void toWKT_polygons(std::vector<Polygon_2> polygons){
+  std::vector<std::string> strings;
+  std::vector<bool> isinsidesomeone;
+
+  //fill the inside booleans
+  bool inside = false;
+  for(std::vector<Polygon_2>::iterator plg = polygons.begin(); plg != polygons.end();++plg){
+    inside = false;
+    for(std::vector<Polygon_2>::iterator plg2 = polygons.begin(); plg2 != polygons.end();++plg2){
+        if(is_inside(*plg2,*plg)) inside = true;
+    }
+    isinsidesomeone.push_back(inside);
+  }
 
   for(std::vector<Polygon_2>::iterator plg1 = polygons.begin(); plg1 != polygons.end();++plg1){
      //print the first polygon part
+     if (isinsidesomeone.at(std::distance(polygons.begin(),plg1))){
+       continue;
+     }
      std::cout << "POLYGON(";
      print_WKT_polygon_2(*plg1);
-
+    
     //check for holes, and print them with the polygon
     for(std::vector<Polygon_2>::iterator plg2 = polygons.begin(); plg2 != polygons.end();++plg2){
 
@@ -235,6 +250,7 @@ void toWKT_polygons(std::vector<Polygon_2> polygons){
     }
     std::cout << ")" << std::endl;
   }
+  
 
 }
 
