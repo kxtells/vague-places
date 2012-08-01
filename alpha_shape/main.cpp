@@ -120,6 +120,21 @@ bool check_inside(Point pt, Polygon_2 pgn, K traits)
   }
 }
 
+/**
+* Checks if plg2 is inside plg1
+*/
+bool check_hole(Polygon_2 plg1, Polygon_2 plg2){
+  bool ishole = true;
+  for (std::vector<Point>::iterator v2 = plg2.vertices_begin();
+      v2 != plg2.vertices_end();
+      ++v2){
+      if(! check_inside(*v2, plg1, K())){
+        ishole = false;
+        break; //stop checking
+      }
+  }
+  return ishole;
+}
 
 /**
 Prints a polygon in its WKT form
@@ -219,7 +234,6 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
   
 
   //Try to determine the holes and print it
-  bool ishole = true;
   for(std::vector<Polygon_2>::iterator plg1 = polygons.begin(); plg1 != polygons.end();++plg1){
      //print the first polygon part
      std::cout << "POLYGON(";
@@ -230,21 +244,12 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
     //check for holes, and print them with the polygon
     for(std::vector<Polygon_2>::iterator plg2 = polygons.begin(); plg2 != polygons.end();++plg2){
 
-      ishole = true;
-      for (std::vector<Point>::iterator v2 = plg2->vertices_begin();
-          v2 != plg2->vertices_end();
-          ++v2){
-          if(! check_inside(*v2, *plg1, K())){
-            ishole = false;
-            break; //stop checking, go to next one
-          }
-      }
-      
-      if (ishole){ //finished, is a hole of the plg1
+      if (check_hole(*plg1,*plg2)){ //finished, is a hole of the plg1
+        std::cout << ",";
         print_WKT_polygon_2(*plg2);
       }
     }
-
+    
     std::cout << ")" << std::endl;
   }
 
