@@ -8,9 +8,11 @@ Takes a list of points and returns a CSV with the correspondent linestrings.
 ************************************************************************/
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/algorithm.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Alpha_shape_2.h>
+#include <CGAL/Boolean_set_operations_2.h>
 
 #include <iostream>
 #include <fstream>
@@ -18,13 +20,13 @@ Takes a list of points and returns a CSV with the correspondent linestrings.
 #include <list>
 
 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 
 typedef K::FT FT;
 
 typedef K::Point_2  Point;
 typedef K::Segment_2  Segment;
-
+typedef CGAL::Polygon_2<K> Polygon_2;
 
 typedef CGAL::Alpha_shape_vertex_base_2<K> Vb;
 typedef CGAL::Alpha_shape_face_base_2<K>  Fb;
@@ -101,6 +103,42 @@ file_input(OutputIterator out)
 
 //------------------ functions --------------------------------------
 
+
+bool check_inside(Point pt, Polygon_2 pgn, K traits)
+{
+  //std::cout << "The point " << pt;
+  switch(CGAL::bounded_side_2(pgn.vertices_begin(), pgn.vertices_end(), pt, traits)) {
+    case CGAL::ON_BOUNDED_SIDE :
+      //std::cout << " is inside the polygon.\n";
+      return true;
+    case CGAL::ON_BOUNDARY:
+      //std::cout << " is on the polygon boundary.\n";
+      return false;
+    case CGAL::ON_UNBOUNDED_SIDE:
+      //std::cout << " is outside the polygon.\n";
+      return false;
+  }
+}
+
+
+/**
+Prints a polygon in its WKT form
+(p1,p2,p3,....)
+
+Does not add POLYGON text. It is used inside other printing functions
+*/
+void print_WKT_polygon_2(Polygon_2 plg){
+  
+  std::cout << "(";
+  for (std::vector<Point>::iterator v = plg.vertices_begin();
+      v != plg.vertices_end();
+      ++v){
+      std::cout << *v << ",";
+  }
+  std::cout << ")";
+
+}
+
 /**
   This function tries to obtain an ordered list of the segments to form a polygon.
 */
@@ -110,7 +148,6 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
   bool found = false;
   int pid = 0; //polygon id (possible alpha shape with different polygons)
   int count = 0;
-  //std::vector<Segment> osegments;
   std::vector<Segment> osegments [255]; //initialize at 255. not more
   std::vector<Segment> segments_tmp;
 
@@ -146,16 +183,71 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
       segments_tmp.pop_back();
     }
   }
+  
 
+  //Prints all the polygons. Do not check if those are holes or not
   for(int i=0;i<255;i++){
-    std::cout << "POLYGON(";
+    if(osegments[i].size()==0) break;
+    
+    std::cout << "POLYGON((";
     std::vector<Segment>::iterator it = osegments[i].begin();
-    std::cout << it->source() << ",";
+    std::cout << it->source() << ","; //first point
+    
     for(std::vector<Segment>::iterator it = osegments[i].begin(); it != osegments[i].end();++it,++count){
       std::cout << it->target() << ",";
     }
+    std::cout << "))" << std::endl;
+  }
+
+  std::cout << "------" << std::endl;
+
+  //TRYING MORE THINGS (determining the holes)
+  //Create Polygon2 structures
+  std::vector<Polygon_2> polygons; //initialize at 255. not more
+  
+  for(int i=0;i<255;i++){
+    if(osegments[i].size()==0) break;
+    Polygon_2 P;
+    std::vector<Segment>::iterator it = osegments[i].begin();
+    P.push_back(it->source()); //first point
+    
+    for(std::vector<Segment>::iterator it = osegments[i].begin(); it != osegments[i].end();++it){
+      P.push_back(it->target());
+    }
+    polygons.push_back(P);
+  }
+  
+
+  //Try to determine the holes and print it
+  bool ishole = true;
+  for(std::vector<Polygon_2>::iterator plg1 = polygons.begin(); plg1 != polygons.end();++plg1){
+     //print the first polygon part
+     std::cout << "POLYGON(";
+     print_WKT_polygon_2(*plg1);
+
+    //polygons.erase(plg1); //already printed, no need to check for him
+
+    //check for holes, and print them with the polygon
+    for(std::vector<Polygon_2>::iterator plg2 = polygons.begin(); plg2 != polygons.end();++plg2){
+
+      ishole = true;
+      for (std::vector<Point>::iterator v2 = plg2->vertices_begin();
+          v2 != plg2->vertices_end();
+          ++v2){
+          if(! check_inside(*v2, *plg1, K())){
+            ishole = false;
+            break; //stop checking, go to next one
+          }
+      }
+      
+      if (ishole){ //finished, is a hole of the plg1
+        print_WKT_polygon_2(*plg2);
+      }
+    }
+
     std::cout << ")" << std::endl;
   }
+
 }
 
 void toWKT_segments(std::vector<Segment> segments, const Alpha_shape_2& A){
@@ -235,6 +327,6 @@ int main(int argc, char* argv[])
  
   //@TEST polygon WKT
   toWKT_polygon(segments,A);
- 
+  std::cout << "END" << std::endl;
   return 0;
 }
