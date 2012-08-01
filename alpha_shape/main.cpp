@@ -1,9 +1,10 @@
 /***********************************************************************
 
-Takes a list of points and returns a CSV with the correspondent linestrings.
+Takes a list of points and returns a CSV with the correspondent MultiPolygon.
 
 
-[-p] -> Returns the points of the edge
+[-p] -> Returns the points of the edge. CSV, WKT
+[-s] -> Returns the segments of the edge. CSV, WKT
 
 ************************************************************************/
 
@@ -156,11 +157,8 @@ void print_WKT_polygon_2(Polygon_2 plg){
 
 }
 
-/**
-  This function tries to obtain an ordered list of the segments to form a polygon.
-*/
-void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
-
+void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 > &polygons){
+  
   Segment cs;
   bool found = false;
   int pid = 0; //polygon id (possible alpha shape with different polygons)
@@ -201,27 +199,6 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
     }
   }
   
-
-  //Prints all the polygons. Do not check if those are holes or not
-  for(int i=0;i<255;i++){
-    if(osegments[i].size()==0) break;
-    
-    std::cout << "POLYGON((";
-    std::vector<Segment>::iterator it = osegments[i].begin();
-    std::cout << it->source() << ","; //first point
-    
-    for(std::vector<Segment>::iterator it = osegments[i].begin(); it != osegments[i].end();++it,++count){
-      std::cout << it->target() << ",";
-    }
-    std::cout << "))" << std::endl;
-  }
-
-  std::cout << "------" << std::endl;
-
-  //TRYING MORE THINGS (determining the holes)
-  //Create Polygon2 structures
-  std::vector<Polygon_2> polygons; //initialize at 255. not more
-  
   for(int i=0;i<255;i++){
     if(osegments[i].size()==0) break;
     Polygon_2 P;
@@ -233,9 +210,16 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
     }
     polygons.push_back(P);
   }
-  
 
-  //Try to determine the holes and print it
+}
+
+/**
+* Prints a WKT version of the polygons to stdout
+*
+* NOTE: if a polygon is inside another polygon is treated as a hole
+*/
+void toWKT_polygons(std::vector<Polygon_2> polygons){
+
   for(std::vector<Polygon_2>::iterator plg1 = polygons.begin(); plg1 != polygons.end();++plg1){
      //print the first polygon part
      std::cout << "POLYGON(";
@@ -257,7 +241,7 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
 /**
 * Prints a csv list of the Alpha shape segments
 */
-void toWKT_segments(std::vector<Segment> segments, const Alpha_shape_2& A){
+void toWKT_segments(std::vector<Segment> segments){
 
   std::cout << "id;wkt" << std::endl;
   int count = 0;
@@ -269,7 +253,7 @@ void toWKT_segments(std::vector<Segment> segments, const Alpha_shape_2& A){
   
 }
 
-void toWKT_vertices(std::vector<Vertex_handle> segments, const Alpha_shape_2& A){
+void toWKT_vertices(std::vector<Vertex_handle> segments){
   int count = 0; 
   
   std::cout << "id;wkt" << std::endl;
@@ -278,19 +262,22 @@ void toWKT_vertices(std::vector<Vertex_handle> segments, const Alpha_shape_2& A)
     std::cout << count << ";" << "POINT(" << p[0] << " " << p[1] << ")" << std::endl;
     count++;
   }
-
-  
 }
+
 //------------------ main -------------------------------------------
 
 int main(int argc, char* argv[])
 {
   //check points flag
   bool bpoints = false;
+  bool bsegments = false;
   float alpha = -1;
   for(int i =0; i < argc; i++){
     if (strcmp(argv[i],"-p")==0) {
         bpoints = true;
+    }
+    else if (strcmp(argv[i],"-s")==0) {
+        bsegments = true;
     }
     if (strcmp(argv[i],"-a") == 0){
         alpha = atof(argv[i+1]);
@@ -320,20 +307,22 @@ int main(int argc, char* argv[])
   
   std::vector<Segment> segments;
   std::vector<Vertex_handle> vertices;
+  std::vector< Polygon_2 > polygons;
 
   alpha_edges( A, std::back_inserter(segments));
   alpha_vertices( A, std::back_inserter(vertices));
+  segments_to_polygons(segments, polygons);
 
-  //print result
+  //Fill and print result
   if (bpoints){
-    //toWKT_vertices(vertices,A);
+    toWKT_vertices(vertices);
+  }
+  else if (bsegments){
+    toWKT_segments(segments);
   }
   else{
-    //toWKT_segments(segments,A);
+   toWKT_polygons(polygons);
   }
- 
-  //@TEST polygon WKT
-  toWKT_polygon(segments,A);
-  std::cout << "END" << std::endl;
+  
   return 0;
 }
