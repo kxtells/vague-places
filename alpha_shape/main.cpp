@@ -141,7 +141,6 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
       /*if not found. I assume that there is another polygon.
         Increase polygon id (pid) and keep going.
       */
-      std::cout << "NObingo " << cs.target() << std::endl;
       ++pid;
       osegments[pid].push_back(segments_tmp.back());
       segments_tmp.pop_back();
