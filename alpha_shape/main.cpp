@@ -94,7 +94,6 @@ file_input(OutputIterator out)
 
   int n;
   is >> n;
-  //std::cout << "Reading " << n << " points from file" << std::endl;
   CGAL::copy_n(std::istream_iterator<Point>(is), n, out);
 
   return true;
@@ -132,7 +131,6 @@ void toWKT_polygon(std::vector<Segment> segments, const Alpha_shape_2& A){
         ++it){
         
         if (cs.target() == it->source()){
-          std::cout << "bingo " << cs.target() << " " << it->source() << std::endl;
           found = true;
           osegments[pid].push_back(*it);
           segments_tmp.erase(it);
@@ -189,15 +187,18 @@ void toWKT_vertices(std::vector<Vertex_handle> segments, const Alpha_shape_2& A)
 
 int main(int argc, char* argv[])
 {
-  //output the points as CSV WKT
+  //check points flag
   bool bpoints = false;
-  for(int i = 0; i < argc; i++){
-    if (strcmp(argv[i],"-p")) {
+  float alpha = -1;
+  for(int i =0; i < argc; i++){
+    if (strcmp(argv[i],"-p")==0) {
         bpoints = true;
+    }
+    if (strcmp(argv[i],"-a") == 0){
+        alpha = atof(argv[i+1]);
     }
   }
 
-    std::cout << bpoints << std::endl;
 
   //File Input
   std::list<Point> points;
@@ -206,21 +207,24 @@ int main(int argc, char* argv[])
     return -1;
   }
 
+  //Alpha shape compute
   Alpha_shape_2 A(points.begin(), points.end());
-  Alpha_iterator opt = A.find_optimal_alpha(1);
-  A.set_alpha(*opt);
-  //A.set_alpha(1);
   A.set_mode(Alpha_shape_2::GENERAL);
+  
+  if (alpha != -1){
+    A.set_alpha(alpha);
+  }
+  else{
+    Alpha_iterator opt = A.find_optimal_alpha(1);
+    A.set_alpha(*opt);
+  }
+  
   
   std::vector<Segment> segments;
   std::vector<Vertex_handle> vertices;
 
   alpha_edges( A, std::back_inserter(segments));
   alpha_vertices( A, std::back_inserter(vertices));
-
-  //std::cout << "Alpha Shape computed" << std::endl;
-  //std::cout << segments.size() << " alpha shape edges" << std::endl;
-  //std::cout << "Optimal alpha: " << *A.find_optimal_alpha(1) <<std::endl;
 
   //print result
   if (bpoints){
@@ -230,6 +234,7 @@ int main(int argc, char* argv[])
     toWKT_segments(segments,A);
   }
  
+  //@TEST polygon WKT
   toWKT_polygon(segments,A);
  
   return 0;
