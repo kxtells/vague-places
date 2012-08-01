@@ -145,12 +145,14 @@ Does not add POLYGON text. It is used inside other printing functions
 void print_WKT_polygon_2(Polygon_2 plg){
   
   std::cout << "(";
-  for (std::vector<Point>::iterator v = plg.vertices_begin();
-      v != plg.vertices_end();
+  std::vector<Point>::iterator v;
+  for ( v = plg.vertices_begin();
+      v != plg.vertices_end()-1;
       ++v){
       std::cout << *v << ",";
   }
-  std::cout << ")";
+  v = plg.vertices_end()-1; //last one with no comma
+  std::cout << *v << ")";
 
 }
 
