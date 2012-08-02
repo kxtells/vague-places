@@ -10,6 +10,7 @@ class cReport():
     live = False;
     WKT = "";
     query = "";
+    ofilename = "";
 
     def set_country_count(self,places):
         """
@@ -33,8 +34,9 @@ class cReport():
         else:
             print "DBpedia Last release version"
 
-        print "QUERY: "+str(self.query).rjust(20);
-        print "Retrieved Points:\t"+str(self.points);
+        print "QUERY: "+str(self.query).ljust(20);
+        print "Retrieved Points:\t",str(self.points).ljust(20);
+        print "FILE:\t",str(self.ofilename).ljust(20);
         print;
         print "country".rjust(30),"|".rjust(5),"total_points".rjust(5)
         
@@ -80,6 +82,9 @@ class cReport():
 
     def set_query(self,query):
         self.query = query;
+    
+    def set_points_filename(self,ofile):
+        self.ofilename = ofile;
     
     def set_live(self,live):
         self.live = live;
