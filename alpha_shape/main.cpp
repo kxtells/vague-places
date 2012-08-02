@@ -86,9 +86,9 @@ alpha_vertices( const Alpha_shape_2&  A,
 
 template <class OutputIterator>
 bool
-file_input(OutputIterator out)
+file_input(OutputIterator out,char* filename)
 {
-  std::ifstream is("./data/fin", std::ios::in);
+  std::ifstream is(filename, std::ios::in);
 
   if(is.fail()){
     std::cerr << "unable to open file for input" << std::endl;
@@ -213,6 +213,13 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
   }
 }
 
+
+//------------------ printing functions -----------------------------
+
+void print_help(){
+    std::cout << "Help message" << std::endl;
+}
+
 /**
 * Prints a WKT version of the polygons to stdout
 *
@@ -287,7 +294,9 @@ int main(int argc, char* argv[])
   //check points flag
   bool bpoints = false;
   bool bsegments = false;
+  char* filename;
   float alpha = -1;
+
   for(int i =0; i < argc; i++){
     if (strcmp(argv[i],"-p")==0) {
         bpoints = true;
@@ -298,13 +307,20 @@ int main(int argc, char* argv[])
     if (strcmp(argv[i],"-a") == 0){
         alpha = atof(argv[i+1]);
     }
+    if (strcmp(argv[i],"-i") == 0){
+        filename = argv[i+1];
+    }
+    if (strcmp(argv[i],"-h") == 0){
+        print_help();
+        exit(0);
+    }
   }
 
 
   //File Input
   std::list<Point> points;
 
-  if(! file_input(std::back_inserter(points))){
+  if(! file_input(std::back_inserter(points),filename)){
     return -1;
   }
 
