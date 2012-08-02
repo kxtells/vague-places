@@ -53,31 +53,13 @@ islive = arguments.live_bool
 RESULTS_QUERY = 500000
 PLACES = []
 
-# Europe Country List
+#sparql endpoint
 if islive:
     sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
 else:
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 
-sparql.setReturnFormat(JSON)
 
-sparql.setQuery("""
-                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                PREFIX yago: <http://dbpedia.org/class/yago/>
-                PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-
-                SELECT DISTINCT ?place WHERE {
-                    ?place rdf:type yago:EuropeanCountries .
-                    ?place rdf:type dbpedia-owl:Country
-                }
-                """
-)
-
-results = sparql.query().convert()
-
-for country in results["results"]["bindings"]:
-    country_uri = country["place"]["value"]
-    country_name = country_uri.rpartition('/')[-1]
 
 #Spinner
 S = cSpinner.cSpinner()
@@ -92,6 +74,26 @@ REPORT.set_query(str(query));
 #  FUNCTIONS
 #
 ############################
+def european_countries():
+    # Europe Country List
+        
+    sparql.setReturnFormat(JSON)
+    
+    sparql.setQuery("""
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX yago: <http://dbpedia.org/class/yago/>
+                    PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+    
+                    SELECT DISTINCT ?place WHERE {
+                        ?place rdf:type yago:EuropeanCountries .
+                        ?place rdf:type dbpedia-owl:Country
+                    }
+                    """
+    )
+
+    results = sparql.query().convert()
+    return results["results"]["bindings"]
+
 def gen_heatmap():
     pass
 
@@ -161,7 +163,7 @@ signal.signal(signal.SIGINT, kill_handler)
 #
 ############################
 
-for country in results["results"]["bindings"]:
+for country in european_countries():
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
     total_results = 0
@@ -207,35 +209,39 @@ for country in results["results"]["bindings"]:
 
 REPORT.set_country_count(PLACES);
 
-############################
-#
-#  POLYGON GENERATION
-#
-############################
-tmpfile = tempfile.NamedTemporaryFile(prefix='vagueplace',delete=False);
-write_file(tmpfile,'cgal')
+if (len(PLACES) > 0):
+    ############################
+    #
+    #  POLYGON GENERATION
+    #
+    ############################
+    tmpfile = tempfile.NamedTemporaryFile(prefix='vagueplace',delete=False);
+    write_file(tmpfile,'cgal')
+    
+    gen_alpha_shape(tmpfile);
+    
+    ############################
+    #
+    #  REPORT PRINTING
+    #
+    ############################
+    REPORT.print_report();
+    
+    
+    ############################
+    #
+    #  FILE WRITING
+    #
+    ############################
+    S.pause();
+    write_file(OF,'csv')
+    
+    ############################
+    #
+    #  CLOSURE
+    #
+    ############################
+else:
+    print "No results for this query"
 
-gen_alpha_shape(tmpfile);
-
-############################
-#
-#  REPORT PRINTING
-#
-############################
-REPORT.print_report();
-
-
-############################
-#
-#  FILE WRITING
-#
-############################
-S.pause();
-write_file(OF,'csv')
-
-############################
-#
-#  CLOSURE
-#
-############################
 finish_program()
