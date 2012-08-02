@@ -217,7 +217,15 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
 //------------------ printing functions -----------------------------
 
 void print_help(){
-    std::cout << "Help message" << std::endl;
+    std::cout << "alpha_shaper -i FILE [-s,-p] [-a A] [-h]" << std::endl;
+    std::cout <<std::endl;
+    std::cout << "Generates an alpha shape WKT as multiple POLYGONS. Result on STDOUT" << std::endl;  
+    std::cout <<std::endl;
+    std::cout << "-i FILE\t Input file with coordinates. First line with total number of coordinates" << std::endl;  
+    std::cout << "-s \t Output the result as CSV with LINESTRING" << std::endl;  
+    std::cout << "-p \t Output the result as CSV with POINTS of the Alpha Shape boundary" << std::endl;  
+    std::cout << "-a \t Select alpha. By default automatically selected by CGAL" << std::endl;  
+    std::cout << "-h \t Print this help" << std::endl;  
 }
 
 /**
@@ -312,7 +320,7 @@ int main(int argc, char* argv[])
     }
     if (strcmp(argv[i],"-h") == 0){
         print_help();
-        exit(0);
+        return 0;
     }
   }
 
