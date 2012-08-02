@@ -209,6 +209,7 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
     for(std::vector<Segment>::iterator it = osegments[i].begin(); it != osegments[i].end();++it){
       P.push_back(it->target());
     }
+    P.push_back(P[0]);
     polygons.push_back(P);
   }
 }
