@@ -2,7 +2,6 @@ from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
 import sys
 import threading
-import time
 import signal
 import os
 import subprocess 
@@ -68,6 +67,7 @@ S.start()
 #report
 REPORT = cReport.cReport();
 REPORT.set_query(str(query));
+REPORT.set_points_filename(os.path.realpath(str(OF.name)));
 
 ############################
 #
@@ -104,12 +104,18 @@ def gen_alpha_shape(cgalfile):
     """
         External system execution of alpha_shaper to generate a WKT alpha shape file
     """
-    expath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"alpha_shape/alpha_shaper");
-    filpath = os.path.realpath(cgalfile.name);
-    wkt_polygons = subprocess.check_output([expath,"-i",filpath])
-    opt_alpha = subprocess.check_output([expath,"-i",filpath,"--optimalalpha"])
-    
-    REPORT.set_alphas(1,opt_alpha)
+    alpha = 0.1;
+    try:
+        expath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"alpha_shape/alpha_shaper");
+        filpath = os.path.realpath(cgalfile.name);
+        wkt_polygons = subprocess.check_output([expath,"-i",filpath,"-a",str(alpha)])
+        opt_alpha = subprocess.check_output([expath,"-i",filpath,"--optimalalpha"])
+    except:
+        wkt_polygons = "Error Executing:"+str(expath)+" -i "+filpath+" -a "+str(alpha);
+        alpha = 0
+        opt_alpha = 0
+
+    REPORT.set_alphas(alpha,opt_alpha)
     REPORT.set_wkt(wkt_polygons)
 
 def finish_program():
