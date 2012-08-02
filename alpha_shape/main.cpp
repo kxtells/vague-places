@@ -266,7 +266,6 @@ void toWKT_polygons(std::vector<Polygon_2> polygons){
     std::cout << ")" << std::endl;
   }
   
-
 }
 
 /**
@@ -302,6 +301,7 @@ int main(int argc, char* argv[])
   //check points flag
   bool bpoints = false;
   bool bsegments = false;
+  bool optalpha = false;
   char* filename;
   float alpha = -1;
 
@@ -314,6 +314,9 @@ int main(int argc, char* argv[])
     }
     if (strcmp(argv[i],"-a") == 0){
         alpha = atof(argv[i+1]);
+    }
+    if (strcmp(argv[i],"--optimalalpha") == 0){
+        optalpha = true;
     }
     if (strcmp(argv[i],"-i") == 0){
         filename = argv[i+1];
@@ -335,12 +338,12 @@ int main(int argc, char* argv[])
   //Alpha shape compute
   Alpha_shape_2 A(points.begin(), points.end());
   A.set_mode(Alpha_shape_2::GENERAL);
+  Alpha_iterator opt = A.find_optimal_alpha(1);
   
   if (alpha != -1){
     A.set_alpha(alpha);
   }
   else{
-    Alpha_iterator opt = A.find_optimal_alpha(1);
     A.set_alpha(*opt);
   }
   
@@ -354,6 +357,10 @@ int main(int argc, char* argv[])
   segments_to_polygons(segments, polygons);
 
   //Fill and print result
+  if (optalpha){
+      std::cout << *opt << std::endl;
+      return 0;
+  }
   if (bpoints){
     toWKT_vertices(vertices);
   }
