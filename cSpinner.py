@@ -8,12 +8,13 @@ class cSpinner(threading.Thread):
     """
     chars = ["\\","|","/","-"]
     index = 0
-    keeprunning = True 
+    keeprunning = True
+    paused = False; 
 
 
     def run(self):
         while self.keeprunning:
-            self.printing(self.chars[self.index%len(self.chars)])
+            if (not self.paused): self.printing(self.chars[self.index%len(self.chars)])
             time.sleep(0.1)
             self.index +=1
 
@@ -24,3 +25,8 @@ class cSpinner(threading.Thread):
     def stop(self):
         self.keeprunning = False
 
+    def pause(self):
+        self.paused = True;
+
+    def unpause(self):
+        self.paused = False;
