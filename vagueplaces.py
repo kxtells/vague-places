@@ -4,9 +4,13 @@ import sys
 import threading
 import time
 import signal
+import os
+import subprocess 
+import tempfile
+
 import cSpinner
 import cPlace
-from libs import heatmap
+import cReport
 
 ############################
 #
@@ -19,11 +23,11 @@ parser = argparse.ArgumentParser(description='CSV generation with name;point;cou
 parser.add_argument('--query', action='store', dest='querystring', default=None,
                     help='Query to filter from the Abstract results')
 
-parser.add_argument('--format', action='store', dest='formatstring', default='csv',
-                    help='Format of the output file [csv,cgal]. default is csv')
+#parser.add_argument('--format', action='store', dest='formatstring', default='csv',
+#                    help='Format of the output file [csv,cgal]. default is csv')
 
 parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
-                    help='File out. [default dbpedia.csv]')
+                    help='Retrieved points file out as CSV. [default dbpedia.csv]')
 
 parser.add_argument('--live', action='store_true',default=False,
                     dest='live_bool',
@@ -42,7 +46,7 @@ arguments  = parser.parse_args()
 #
 ############################
 query = arguments.querystring
-oformat = arguments.formatstring
+#oformat = arguments.formatstring
 OF = arguments.fileout
 isdebug = arguments.debug_bool
 islive = arguments.live_bool
@@ -79,6 +83,8 @@ for country in results["results"]["bindings"]:
 S = cSpinner.cSpinner()
 S.start()
 
+#report
+REPORT = cReport.cReport();
 
 ############################
 #
@@ -87,6 +93,21 @@ S.start()
 ############################
 def gen_heatmap():
     pass
+
+def gen_convex_hull():
+    pass
+
+def gen_alpha_shape(cgalfile):
+    """
+        External system execution of alpha_shaper to generate a WKT alpha shape file
+    """
+    expath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"alpha_shape/alpha_shaper");
+    filpath = os.path.realpath(cgalfile.name);
+    wkt_polygons = subprocess.check_output([expath,"-i",filpath])
+    opt_alpha = subprocess.check_output([expath,"-i",filpath,"--optimalalpha"])
+    
+    REPORT.set_alphas(1,opt_alpha)
+    REPORT.set_wkt(wkt_polygons)
 
 def finish_program():
     OF.close()
@@ -99,7 +120,7 @@ def write_file_cgal(fileh):
     """
     fileh.write(str(len(PLACES))+"\n")
     for p in PLACES:
-        fileh.write(p.lat+" "+p.lon+"\n")
+        fileh.write(p.lon+" "+p.lat+"\n")
 
 def write_file_csv(fileh):
     """ 
@@ -109,7 +130,7 @@ def write_file_csv(fileh):
     fileh.write(header)
 
     for p in PLACES:
-        fileh.write(p.name+"; POINT("+p.lon+" "+p.lat+");"+p.country+";"+p.text)
+        fileh.write(p.name+"; POINT("+p.lon+" "+p.lat+");"+p.country+";"+p.text+"\n")
 
 def write_file(fileh,wf):
     """ 
@@ -119,6 +140,7 @@ def write_file(fileh,wf):
         write_file_cgal(fileh)
     elif wf.lower() == 'csv':
         write_file_csv(fileh)
+
 
 ############################
 #
@@ -137,7 +159,6 @@ signal.signal(signal.SIGINT, kill_handler)
 #
 ############################
 
-
 for country in results["results"]["bindings"]:
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
@@ -155,7 +176,7 @@ for country in results["results"]["bindings"]:
                   ?place geo:lat ?geolat .
                   ?place geo:long ?geolong .
                   ?place dbpedia-owl:abstract ?abstract .
-                  FILTER ( regex(?abstract,\" """ + str(query) + """\","i") )
+                  FILTER ( regex(?abstract,\" """ + str(query) +"""\","i") )
                 }
                 OFFSET """ + str(offset) + """
                 LIMIT """ + str(RESULTS_QUERY)+ """
@@ -179,14 +200,36 @@ for country in results["results"]["bindings"]:
             print type(inst)
             print "EXCEPTION"
 
-    if isdebug: print country_uri, total_results
+    if isdebug: 
+        sys.stdout.write("\r\x1b[K"+country_uri+" "+str(total_results)+"\n")
+        sys.stdout.flush()
+
+REPORT.set_country_count(PLACES);
+
+############################
+#
+#  POLYGON GENERATION
+#
+############################
+tmpfile = tempfile.NamedTemporaryFile();
+write_file(tmpfile,'cgal')
+gen_alpha_shape(tmpfile);
+
+############################
+#
+#  REPORT PRINTING
+#
+############################
+REPORT.print_report();
+
 
 ############################
 #
 #  FILE WRITING
 #
 ############################
-write_file(OF,oformat)
+S.pause();
+write_file(OF,'csv')
 
 ############################
 #
