@@ -66,7 +66,7 @@ sparql.setQuery("""
                 PREFIX yago: <http://dbpedia.org/class/yago/>
                 PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
 
-                SELECT ?place WHERE {
+                SELECT DISTINCT ?place WHERE {
                     ?place rdf:type yago:EuropeanCountries .
                     ?place rdf:type dbpedia-owl:Country
                 }
@@ -85,6 +85,7 @@ S.start()
 
 #report
 REPORT = cReport.cReport();
+REPORT.set_query(str(query));
 
 ############################
 #
@@ -140,6 +141,7 @@ def write_file(fileh,wf):
         write_file_cgal(fileh)
     elif wf.lower() == 'csv':
         write_file_csv(fileh)
+    fileh.close()
 
 
 ############################
@@ -183,7 +185,6 @@ for country in results["results"]["bindings"]:
                 """)
 
             country_results = sparql.query().convert()
-
             for result in country_results["results"]["bindings"]:
                 title = result["title"]["value"].encode('ascii','ignore')
                 lat = result ["geolat"]["value"]
@@ -211,8 +212,9 @@ REPORT.set_country_count(PLACES);
 #  POLYGON GENERATION
 #
 ############################
-tmpfile = tempfile.NamedTemporaryFile();
+tmpfile = tempfile.NamedTemporaryFile(prefix='vagueplace',delete=False);
 write_file(tmpfile,'cgal')
+
 gen_alpha_shape(tmpfile);
 
 ############################
