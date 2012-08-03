@@ -169,12 +169,14 @@ signal.signal(signal.SIGINT, kill_handler)
 #  START
 #
 ############################
-
 for country in european_countries():
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
     total_results = 0
     query_results = 1
+    
+    S.set_msg(country_name)
+
     offset = 0
     while query_results > 0:
         try:
@@ -194,6 +196,7 @@ for country in european_countries():
                 """)
 
             country_results = sparql.query().convert()
+            
             for result in country_results["results"]["bindings"]:
                 title = result["title"]["value"].encode('ascii','ignore')
                 lat = result ["geolat"]["value"]
@@ -205,12 +208,10 @@ for country in european_countries():
             query_results = len(country_results["results"]["bindings"])
             offset = offset + query_results
             total_results += query_results
-
         except Exception as inst:
             print type(inst)
             print "EXCEPTION"
 
-    S.set_msg(country_name)
     
     if isdebug: 
         sys.stdout.write("\r\x1b[K"+country_uri+" "+str(total_results)+"\n")
