@@ -8,7 +8,8 @@ class cReport():
     countries = [];
     country_val = [];
     live = False;
-    WKT = "";
+    WKTashape = "";
+    WKTchull = "";
     query = "";
     ofilename = "";
 
@@ -44,13 +45,14 @@ class cReport():
             print str(c).rjust(30),"|".rjust(5),str(self.country_val[i]).rjust(5)
 
       
-        self.print_banner("Alpha Shape")
-        print "---- WKT ---";
-        print self.WKT;
-        print "Alpha:"+str(self.alpha).rjust(20)
-        print "Optimal Alpha: "+str(self.optalpha).rjust(20);
-        
-
+        self.print_banner("GEOMETRIES")
+        print "---- Alpha Shape WKT ---";
+        print self.WKTashape;
+        print "Alpha:"+str(self.alpha).ljust(20)
+        print "Optimal Alpha: "+str(self.optalpha).ljust(20);
+        print
+        print "---- Convex Hull Shape WKT ---";
+        print self.WKTchull;
 
     def print_title(self):
         print;
@@ -77,8 +79,11 @@ class cReport():
         self.alpha = alpha;
         self.optalpha = optalpha;
 
-    def set_wkt(self,wkt):
-        self.WKT = wkt;
+    def set_wkt_ashape(self,wkt):
+        self.WKTashape = wkt;
+
+    def set_wkt_chull(self,wkt):
+        self.WKTchull = wkt;
 
     def set_query(self,query):
         self.query = query;
