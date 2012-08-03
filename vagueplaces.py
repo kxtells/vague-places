@@ -181,7 +181,7 @@ for country in european_countries():
     while query_results > 0:
         try:
             sparql.setQuery("""
-                SELECT ?title,?geolat,?geolong,?abstract
+                SELECT DISTINCT ?title,?geolat,?geolong
                 WHERE{
                   ?place rdf:type dbpedia-owl:Place .
                   ?place dbpedia-owl:country <""" + country_uri + """> .
@@ -202,8 +202,10 @@ for country in european_countries():
                 lat = result ["geolat"]["value"]
                 lon = result["geolong"]["value"]
                 country = country_name
-                abstract = result["abstract"]["value"].encode('ascii','ignore')
-                PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
+                #abstract = result["abstract"]["value"].encode('ascii','ignore')
+                abstract = ""
+                if(lat!='NAN' and lon != 'NAN'):
+                    PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
 
             query_results = len(country_results["results"]["bindings"])
             offset = offset + query_results
