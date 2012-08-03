@@ -1,15 +1,14 @@
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
 import sys
-import threading
 import signal
 import os
-import subprocess 
 import tempfile
 
 import cSpinner
 import cPlace
 import cReport
+import geom_functions as GEOM
 
 ############################
 #
@@ -62,6 +61,7 @@ else:
 
 #Spinner
 S = cSpinner.cSpinner()
+S.set_msg("loading")
 S.start()
 
 #report
@@ -95,28 +95,29 @@ def european_countries():
     return results["results"]["bindings"]
 
 def gen_heatmap():
+    
     pass
 
 def gen_convex_hull():
-    pass
+    """
+        Generate the convex hull for the report
+    """
+    plist = []
+    
+    for p in PLACES:
+        plist.append((float(p.lon),float(p.lat)))
+
+    REPORT.set_wkt_chull(GEOM.convex_hull(plist))
 
 def gen_alpha_shape(cgalfile):
     """
-        External system execution of alpha_shaper to generate a WKT alpha shape file
+        External system execution of alpha_shaper to generate a WKT alpha shape file.
+        Expects a CGAL file with lon lat corrdinates and the first line an integer
+        of the total number of lines to read
     """
-    alpha = 0.1;
-    try:
-        expath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"alpha_shape/alpha_shaper");
-        filpath = os.path.realpath(cgalfile.name);
-        wkt_polygons = subprocess.check_output([expath,"-i",filpath,"-a",str(alpha)])
-        opt_alpha = subprocess.check_output([expath,"-i",filpath,"--optimalalpha"])
-    except:
-        wkt_polygons = "Error Executing:"+str(expath)+" -i "+filpath+" -a "+str(alpha);
-        alpha = 0
-        opt_alpha = 0
-
+    alpha,opt_alpha,wkt_polygons = GEOM.alpha_shape(cgalfile);
     REPORT.set_alphas(alpha,opt_alpha)
-    REPORT.set_wkt(wkt_polygons)
+    REPORT.set_wkt_ashape(wkt_polygons)
 
 def finish_program():
     OF.close()
@@ -209,6 +210,8 @@ for country in european_countries():
             print type(inst)
             print "EXCEPTION"
 
+    S.set_msg(country_name)
+    
     if isdebug: 
         sys.stdout.write("\r\x1b[K"+country_uri+" "+str(total_results)+"\n")
         sys.stdout.flush()
@@ -225,6 +228,7 @@ if (len(PLACES) > 0):
     write_file(tmpfile,'cgal')
     
     gen_alpha_shape(tmpfile);
+    gen_convex_hull();
     
     ############################
     #
