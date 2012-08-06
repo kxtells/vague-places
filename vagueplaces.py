@@ -18,16 +18,13 @@ import geom_functions as GEOM
 
 parser = argparse.ArgumentParser(description='CSV generation with name;point;country querying dbpedia')
 
-parser.add_argument('--query', action='store', dest='querystring', default=None,
+parser.add_argument('--query', action='store', dest='stringval', default=None,
                     help='Query to filter from the Abstract results')
 
-#parser.add_argument('--format', action='store', dest='formatstring', default='csv',
-#                    help='Format of the output file [csv,cgal]. default is csv')
-
-parser.add_argument('--alpha',type=float,default=0.1,dest='alphaval')
+parser.add_argument('--alpha',type=float,default=0.1,dest='floatval')
 
 parser.add_argument('CSV_POINT_OUTPUT', type=argparse.FileType('wb', 0),
-                    help='Retrieved points file out as CSV. [default dbpedia.csv]')
+                    help='Retrieved points file out as CSV.')
 
 parser.add_argument('--live', action='store_true',default=False,
                     dest='live_bool',
@@ -45,10 +42,10 @@ arguments  = parser.parse_args()
 #  INITIALIZATIONS
 #
 ############################
-query = arguments.querystring
+query = arguments.stringval
 #oformat = arguments.formatstring
 OF = arguments.CSV_POINT_OUTPUT
-alpha = arguments.alphaval
+alpha = arguments.floatval
 isdebug = arguments.debug_bool
 islive = arguments.live_bool
 RESULTS_QUERY = 500000
