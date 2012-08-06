@@ -24,7 +24,7 @@ class cReport():
                 self.country_val[index] += 1
             except:
                 self.countries.append(p.country)
-                self.country_val.append(0)
+                self.country_val.append(1)
 
     def print_report(self):
         self.print_title();
