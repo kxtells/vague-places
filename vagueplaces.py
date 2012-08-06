@@ -26,7 +26,7 @@ parser.add_argument('--query', action='store', dest='querystring', default=None,
 
 parser.add_argument('--alpha',type=float,default=0.1,dest='alphaval')
 
-parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
+parser.add_argument('CSV_POINT_OUTPUT', type=argparse.FileType('wb', 0),
                     help='Retrieved points file out as CSV. [default dbpedia.csv]')
 
 parser.add_argument('--live', action='store_true',default=False,
@@ -47,7 +47,7 @@ arguments  = parser.parse_args()
 ############################
 query = arguments.querystring
 #oformat = arguments.formatstring
-OF = arguments.fileout
+OF = arguments.CSV_POINT_OUTPUT
 alpha = arguments.alphaval
 isdebug = arguments.debug_bool
 islive = arguments.live_bool
