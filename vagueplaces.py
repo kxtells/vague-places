@@ -24,6 +24,8 @@ parser.add_argument('--query', action='store', dest='querystring', default=None,
 #parser.add_argument('--format', action='store', dest='formatstring', default='csv',
 #                    help='Format of the output file [csv,cgal]. default is csv')
 
+parser.add_argument('--alpha',type=float,default=0.1,dest='alphaval')
+
 parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
                     help='Retrieved points file out as CSV. [default dbpedia.csv]')
 
@@ -46,6 +48,7 @@ arguments  = parser.parse_args()
 query = arguments.querystring
 #oformat = arguments.formatstring
 OF = arguments.fileout
+alpha = arguments.alphaval
 isdebug = arguments.debug_bool
 islive = arguments.live_bool
 RESULTS_QUERY = 500000
@@ -56,8 +59,6 @@ if islive:
     sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
 else:
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
-
-
 
 #Spinner
 S = cSpinner.cSpinner()
@@ -109,13 +110,13 @@ def gen_convex_hull():
 
     REPORT.set_wkt_chull(GEOM.convex_hull(plist))
 
-def gen_alpha_shape(cgalfile):
+def gen_alpha_shape(cgalfile,alpha):
     """
         External system execution of alpha_shaper to generate a WKT alpha shape file.
         Expects a CGAL file with lon lat corrdinates and the first line an integer
         of the total number of lines to read
     """
-    alpha,opt_alpha,wkt_polygons = GEOM.alpha_shape(cgalfile);
+    opt_alpha,wkt_polygons = GEOM.alpha_shape(cgalfile,alpha);
     REPORT.set_alphas(alpha,opt_alpha)
     REPORT.set_wkt_ashape(wkt_polygons)
 
@@ -230,7 +231,7 @@ if (len(PLACES) > 0):
     tmpfile = tempfile.NamedTemporaryFile(prefix='vagueplace',delete=False);
     write_file(tmpfile,'cgal')
     
-    gen_alpha_shape(tmpfile);
+    gen_alpha_shape(tmpfile,alpha);
     gen_convex_hull();
     
     ############################

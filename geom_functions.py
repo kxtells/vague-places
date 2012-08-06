@@ -9,13 +9,12 @@ def convex_hull(latlon_list):
     """
     return MultiPoint(latlon_list).convex_hull.wkt
 
-def alpha_shape(cgalfile):
+def alpha_shape(cgalfile,alpha):
     """
         External system execution of alpha_shaper to generate a WKT alpha shape file.
         Expects a CGAL file with lon lat corrdinates and the first line an integer
         of the total number of lines to read
     """
-    alpha = 0.1;
     expath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"alpha_shape/alpha_shaper");
     filpath = os.path.realpath(cgalfile.name);
     
@@ -27,5 +26,5 @@ def alpha_shape(cgalfile):
         alpha = 0
         opt_alpha = 0
 
-    return (alpha,opt_alpha,wkt_polygons)
+    return (opt_alpha,wkt_polygons)
 
