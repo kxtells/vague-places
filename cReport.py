@@ -37,6 +37,7 @@ class cReport():
 
         print "QUERY: "+str(self.query).ljust(20);
         print "Retrieved Points:\t",str(self.points).ljust(20);
+        print "Skipped Points:\t",str(self.points - sum(self.country_val)).ljust(20);
         print "FILE:\t",str(self.ofilename).ljust(20);
         print;
         print "country".rjust(30),"|".rjust(5),"total_points".rjust(5)
