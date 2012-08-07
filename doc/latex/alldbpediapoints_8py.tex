@@ -1,0 +1,55 @@
+\hypertarget{alldbpediapoints_8py}{\section{alldbpediapoints.\-py \-File \-Reference}
+\label{alldbpediapoints_8py}\index{alldbpediapoints.\-py@{alldbpediapoints.\-py}}
+}
+\subsection*{\-Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classalldbpediapoints_1_1cSpinner}{alldbpediapoints.\-c\-Spinner}
+\begin{DoxyCompactList}\small\item\em \-C\-L\-A\-S\-S\-E\-S. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacealldbpediapoints}{alldbpediapoints}
+\end{DoxyCompactItemize}
+\subsection*{\-Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacealldbpediapoints_aaec8066f21e8feca8af72f06950032ef}{alldbpediapoints.\-finish\-\_\-program}
+\begin{DoxyCompactList}\small\item\em \-F\-U\-N\-C\-T\-I\-O\-N\-S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacealldbpediapoints_a8ee0c7095504249e8c8489846e8daa8e}{alldbpediapoints.\-wait\-\_\-to\-\_\-continue}
+\item 
+def \hyperlink{namespacealldbpediapoints_ad95dd1eda2480215bd86bdbe7294db2e}{alldbpediapoints.\-get\-\_\-total\-\_\-dbpedia\-\_\-points}
+\item 
+def \hyperlink{namespacealldbpediapoints_a144b7a2a48519add54b2a8c8dfd41395}{alldbpediapoints.\-kill\-\_\-handler}
+\begin{DoxyCompactList}\small\item\em \-S\-I\-G\-N\-A\-L \-H\-A\-N\-D\-L\-I\-N\-G. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespacealldbpediapoints_adf8df4e9e7647db7138cbc856f138d08}{alldbpediapoints.\-parser} = argparse.\-Argument\-Parser(description='\-C\-S\-V generation with name;point;country querying dbpedia')
+\begin{DoxyCompactList}\small\item\em \-A\-R\-G\-U\-M\-E\-N\-T \-P\-A\-R\-S\-I\-N\-G. \end{DoxyCompactList}\item 
+string \hyperlink{namespacealldbpediapoints_ab3aabe434bef7bdc96533eb4b05d5eae}{alldbpediapoints.\-help} = '\-File out. \mbox{[}default dbpedia.\-csv\mbox{]}'
+\item 
+string \hyperlink{namespacealldbpediapoints_a0739afb70aa3bc6f6a1e4ae7b9c876ee}{alldbpediapoints.\-dest} = 'live\-\_\-bool'
+\item 
+tuple \hyperlink{namespacealldbpediapoints_a6550dc5d8362b16ccb483fa5e9b76c53}{alldbpediapoints.\-arguments} = parser.\-parse\-\_\-args()
+\item 
+\hyperlink{namespacealldbpediapoints_ab8a03fffea8583884638a93339ff4523}{alldbpediapoints.\-O\-F} = arguments.\-fileout
+\item 
+\hyperlink{namespacealldbpediapoints_a4222234d924a677b768a452ce5dea7e1}{alldbpediapoints.\-islive} = arguments.\-live\-\_\-bool
+\item 
+int \hyperlink{namespacealldbpediapoints_aa84c23bff204551129efc030239a1d30}{alldbpediapoints.\-R\-E\-S\-U\-L\-T\-S\-\_\-\-Q\-U\-E\-R\-Y} = 20000
+\item 
+tuple \hyperlink{namespacealldbpediapoints_a7a4fa8530ce9061fe014924a1676e73d}{alldbpediapoints.\-sparql} = \-S\-P\-A\-R\-Q\-L\-Wrapper(\char`\"{}http\-://live.\-dbpedia.\-org/sparql\char`\"{})
+\item 
+tuple \hyperlink{namespacealldbpediapoints_ac1f9f39e29a7aedbcc64e9538f476a72}{alldbpediapoints.\-S} = c\-Spinner()
+\item 
+string \hyperlink{namespacealldbpediapoints_a4b54f931c46b9fb9da599923641a2faf}{alldbpediapoints.\-header} = \char`\"{}name;\-W\-K\-T$\backslash$n\char`\"{}
+\begin{DoxyCompactList}\small\item\em \-S\-T\-A\-R\-T. \end{DoxyCompactList}\item 
+int \hyperlink{namespacealldbpediapoints_ac0a3e9672828e3fea0d6d2aafa31b2da}{alldbpediapoints.\-total\-\_\-results} = 0
+\item 
+int \hyperlink{namespacealldbpediapoints_a68f0d6010ae0d06cda635211083677a5}{alldbpediapoints.\-query\-\_\-results} = 1
+\item 
+int \hyperlink{namespacealldbpediapoints_ab7c98613bae9215521f07b8219c81bcc}{alldbpediapoints.\-offset} = 0
+\item 
+tuple \hyperlink{namespacealldbpediapoints_a806e39dd7996f0e6701f925654922fc9}{alldbpediapoints.\-results\-\_\-array} = sparql.\-query()
+\end{DoxyCompactItemize}
