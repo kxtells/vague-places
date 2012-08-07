@@ -1,3 +1,7 @@
+"""
+ MAIN FILE
+ @author Jordi Castells
+"""
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
 import sys
@@ -43,7 +47,6 @@ arguments  = parser.parse_args()
 #
 ############################
 query = arguments.stringval
-#oformat = arguments.formatstring
 OF = arguments.CSV_POINT_OUTPUT
 alpha = arguments.floatval
 isdebug = arguments.debug_bool
@@ -73,8 +76,9 @@ REPORT.set_points_filename(os.path.realpath(str(OF.name)));
 #
 ############################
 def european_countries():
-    # Europe Country List
-        
+    """
+        Retrieve an europe country list from DBpedia with URIs.
+    """
     sparql.setReturnFormat(JSON)
     
     sparql.setQuery("""
@@ -92,8 +96,40 @@ def european_countries():
     results = sparql.query().convert()
     return results["results"]["bindings"]
 
-def gen_heatmap():
+## Retrieve a list of points from DBpedia matching the input.
+# @param country_uri country to query
+# @param query substring to check in the Abstract
+# @param offset Offset to start retrieving
+# @param limit Limit of lines to retrieve
+# @return List with points with title,geolat,geolong
+def get_points(country_uri,query,offset,limit):
+    """
+        Retrieve a list of points from DBpedia matching the input.
+        @param country_uri country to query
+        @param query substring to check in the Abstract
+        @param offset Offset to start retrieving
+        @param limit Limit of lines to retrieve
+        @return List with points with title,geolat,geolong
+    """
+    sparql.setQuery("""
+        SELECT DISTINCT ?title,?geolat,?geolong
+        WHERE{
+          ?place rdf:type dbpedia-owl:Place .
+          ?place dbpedia-owl:country <""" + country_uri + """> .
+          ?place foaf:name ?title .
+          ?place geo:lat ?geolat .
+          ?place geo:long ?geolong .
+          ?place dbpedia-owl:abstract ?abstract .
+          FILTER ( regex(?abstract,\" """ + str(query) +"""\","i") )
+        }
+        OFFSET """ + str(offset) + """
+        LIMIT """ + str(limit)+ """
+        """)
     
+    country_results = sparql.query().convert()
+    return country_results["results"]["bindings"]
+         
+def gen_heatmap():
     pass
 
 def gen_convex_hull():
@@ -178,24 +214,9 @@ for country in european_countries():
     offset = 0
     while query_results > 0:
         try:
-            sparql.setQuery("""
-                SELECT DISTINCT ?title,?geolat,?geolong
-                WHERE{
-                  ?place rdf:type dbpedia-owl:Place .
-                  ?place dbpedia-owl:country <""" + country_uri + """> .
-                  ?place foaf:name ?title .
-                  ?place geo:lat ?geolat .
-                  ?place geo:long ?geolong .
-                  ?place dbpedia-owl:abstract ?abstract .
-                  FILTER ( regex(?abstract,\" """ + str(query) +"""\","i") )
-                }
-                OFFSET """ + str(offset) + """
-                LIMIT """ + str(RESULTS_QUERY)+ """
-                """)
-
-            country_results = sparql.query().convert()
+            country_results = get_points(country_uri,query,offset,RESULTS_QUERY)
             
-            for result in country_results["results"]["bindings"]:
+            for result in country_results:
                 title = result["title"]["value"].encode('ascii','ignore')
                 lat = result ["geolat"]["value"]
                 lon = result["geolong"]["value"]
@@ -205,7 +226,7 @@ for country in european_countries():
                 if(lat!='NAN' and lon != 'NAN'):
                     PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
 
-            query_results = len(country_results["results"]["bindings"])
+            query_results = len(country_results)
             offset = offset + query_results
             total_results += query_results
         except Exception as inst:
