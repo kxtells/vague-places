@@ -138,10 +138,9 @@ bool is_inside(Polygon_2 plg1, Polygon_2 plg2){
 }
 
 /**
-Prints a polygon in its WKT form
-(p1,p2,p3,....)
+\brief Prints a polygon in its WKT form (p1,p2,p3,....)
 
-Does not add POLYGON text. It is used inside other printing functions
+\note Does not add POLYGON text. It is used inside other printing functions
 */
 void print_WKT_polygon_2(Polygon_2 plg){
  
@@ -158,6 +157,12 @@ void print_WKT_polygon_2(Polygon_2 plg){
 
 }
 
+/**
+ \brief Generates a vector of polygons from a vector of segments
+ \details First separes the segments in different adjacent groups (that would be the polygons). Then generates a polygon from each of the lists
+ \param segments an std::vector<Segment> with CGAL segment_2
+ \param &polygons INOUT A std::vector<Polygon_2> with CGAL Polygon_2
+*/
 void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 > &polygons){
   
   Segment cs;
