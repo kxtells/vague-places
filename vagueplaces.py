@@ -1,6 +1,7 @@
 """
  MAIN FILE
- @author Jordi Castells
+ \author Jordi Castells
+ \date 10 August 2012
 """
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
@@ -14,16 +15,16 @@ import cPlace
 import cReport
 import geom_functions as GEOM
 
-############################
+# ###########################
 #
 #  ARGUMENT PARSING
 #
-############################
+# ###########################
 
 parser = argparse.ArgumentParser(description='CSV generation with name;point;country querying dbpedia')
 
-parser.add_argument('--query', action='store', dest='stringval', default=None,
-                    help='Query to filter from the Abstract results')
+parser.add_argument('--query', action='store', dest='stringval', default=None,nargs='+',
+                    help='List of keywords to filter from the Abstract results. Interpreted as Logical disjunction')
 
 parser.add_argument('--alpha',type=float,default=0.1,dest='floatval')
 
@@ -41,12 +42,12 @@ parser.add_argument('--verbose', action='store_true', default=False,
 arguments  = parser.parse_args()
 
 
-############################
+# ###########################
 #
 #  INITIALIZATIONS
 #
-############################
-query = arguments.stringval
+# ###########################
+query_list = arguments.stringval
 OF = arguments.CSV_POINT_OUTPUT
 alpha = arguments.floatval
 isdebug = arguments.debug_bool
@@ -56,7 +57,8 @@ PLACES = []
 
 #sparql endpoint
 if islive:
-    sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
+    #sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
+    sparql = SPARQLWrapper("http://dbpedia-live.openlinksw.com/sparql")
 else:
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 
@@ -67,17 +69,18 @@ S.start()
 
 #report
 REPORT = cReport.cReport();
-REPORT.set_query(str(query));
+REPORT.set_query(str(query_list));
 REPORT.set_points_filename(os.path.realpath(str(OF.name)));
 
-############################
+# ###########################
 #
 #  FUNCTIONS
 #
-############################
+# ###########################
 def european_countries():
     """
         Retrieve an europe country list from DBpedia with URIs.
+        @return List with country URIS
     """
     sparql.setReturnFormat(JSON)
     
@@ -96,22 +99,22 @@ def european_countries():
     results = sparql.query().convert()
     return results["results"]["bindings"]
 
-## Retrieve a list of points from DBpedia matching the input.
-# @param country_uri country to query
-# @param query substring to check in the Abstract
-# @param offset Offset to start retrieving
-# @param limit Limit of lines to retrieve
-# @return List with points with title,geolat,geolong
-def get_points(country_uri,query,offset,limit):
+def get_points(country_uri,query_list,offset,limit):
     """
         Retrieve a list of points from DBpedia matching the input.
-        @param country_uri country to query
-        @param query substring to check in the Abstract
-        @param offset Offset to start retrieving
-        @param limit Limit of lines to retrieve
-        @return List with points with title,geolat,geolong
+        \param country_uri country to query
+        \param query substring to check in the Abstract
+        \param offset Offset to start retrieving
+        \param limit Limit of lines to retrieve
+        \return List with points with title,geolat,geolong
     """
-    sparql.setQuery("""
+    regex_list = []
+    for q in query_list:
+        regex_list.append("""regex(?abstract,\" """+str(q)+"""\","i") """)
+
+    query = "||".join(regex_list)
+
+    querystr = """
         SELECT DISTINCT ?title,?geolat,?geolong
         WHERE{
           ?place rdf:type dbpedia-owl:Place .
@@ -120,16 +123,21 @@ def get_points(country_uri,query,offset,limit):
           ?place geo:lat ?geolat .
           ?place geo:long ?geolong .
           ?place dbpedia-owl:abstract ?abstract .
-          FILTER ( regex(?abstract,\" """ + str(query) +"""\","i") )
+          FILTER ("""+ query +""")
         }
         OFFSET """ + str(offset) + """
         LIMIT """ + str(limit)+ """
-        """)
+        """
+
+    sparql.setQuery(querystr)
     
     country_results = sparql.query().convert()
     return country_results["results"]["bindings"]
          
 def gen_heatmap():
+    """
+         \todo gen_heatmap is not implemented
+    """
     pass
 
 def gen_convex_hull():
@@ -187,34 +195,34 @@ def write_file(fileh,wf):
     fileh.close()
 
 
-############################
+# ###########################
 #
 #  SIGNAL HANDLING
 #
-############################
+# ###########################
 def kill_handler(signal, frame):
     print 'Kill Signal Recieved'
     finish_program()
 
 signal.signal(signal.SIGINT, kill_handler)
 
-############################
+# ###########################
 #
 #  START
 #
-############################
+# ###########################
 for country in european_countries():
     country_uri = country["place"]["value"]
     country_name = country_uri.rpartition('/')[-1]
     total_results = 0
+    offset = 0
     query_results = 1
     
     S.set_msg(country_name)
 
-    offset = 0
     while query_results > 0:
         try:
-            country_results = get_points(country_uri,query,offset,RESULTS_QUERY)
+            country_results = get_points(country_uri,query_list,offset,RESULTS_QUERY)
             
             for result in country_results:
                 title = result["title"]["value"].encode('ascii','ignore')
@@ -241,38 +249,38 @@ for country in european_countries():
 REPORT.set_country_count(PLACES);
 
 if (len(PLACES) > 0):
-    ############################
+    # ###########################
     #
     #  POLYGON GENERATION
     #
-    ############################
+    # ###########################
     tmpfile = tempfile.NamedTemporaryFile(prefix='vagueplace',delete=False);
     write_file(tmpfile,'cgal')
     
     gen_alpha_shape(tmpfile,alpha);
     gen_convex_hull();
     
-    ############################
+    # ###########################
     #
     #  REPORT PRINTING
     #
-    ############################
+    # ###########################
     REPORT.print_report();
     
     
-    ############################
+    # ###########################
     #
     #  FILE WRITING
     #
-    ############################
+    # ###########################
     S.pause();
     write_file(OF,'csv')
     
-    ############################
+    # ###########################
     #
     #  CLOSURE
     #
-    ############################
+    # ###########################
 else:
     print "No results for this query"
 
