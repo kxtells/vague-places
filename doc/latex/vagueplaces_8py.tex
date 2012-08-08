@@ -1,7 +1,7 @@
 \hypertarget{vagueplaces_8py}{\section{vagueplaces.\-py \-File \-Reference}
 \label{vagueplaces_8py}\index{vagueplaces.\-py@{vagueplaces.\-py}}
 }
-\subsection*{\-Namespaces}
+\subsection*{\-Packages}
 \begin{DoxyCompactItemize}
 \item 
 namespace \hyperlink{namespacevagueplaces}{vagueplaces}
@@ -10,38 +10,38 @@ namespace \hyperlink{namespacevagueplaces}{vagueplaces}
 \begin{DoxyCompactItemize}
 \item 
 def \hyperlink{namespacevagueplaces_adec54b9e74dc2de30d17a2fe161f137c}{vagueplaces.\-european\-\_\-countries}
-\begin{DoxyCompactList}\small\item\em \-F\-U\-N\-C\-T\-I\-O\-N\-S. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em \-Retrieve an europe country list from \-D\-Bpedia with \-U\-R\-Is. \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_aed235c5c580e7ab436215ad07be55b27}{vagueplaces.\-get\-\_\-points}
 \begin{DoxyCompactList}\small\item\em \-Retrieve a list of points from \-D\-Bpedia matching the input. \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_a085e07955df048db8ed1621669a4a064}{vagueplaces.\-gen\-\_\-heatmap}
 \item 
 def \hyperlink{namespacevagueplaces_abace2d9a58e6249fea81bb4163cd9ef6}{vagueplaces.\-gen\-\_\-convex\-\_\-hull}
-\item 
+\begin{DoxyCompactList}\small\item\em \-Generate the convex hull for the report. \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_a97ab699f1b7ffdaf4b86a2342cc1bdc3}{vagueplaces.\-gen\-\_\-alpha\-\_\-shape}
-\item 
+\begin{DoxyCompactList}\small\item\em \-External system execution of alpha\-\_\-shaper to generate a \-W\-K\-T alpha shape file. \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_a8384e83cc2817ccd5697611b911be2e5}{vagueplaces.\-finish\-\_\-program}
 \item 
 def \hyperlink{namespacevagueplaces_a31c6bc6970f61bd314e35668a15bfa6f}{vagueplaces.\-write\-\_\-file\-\_\-cgal}
-\item 
+\begin{DoxyCompactList}\small\item\em \-Writes a file to be read by cgal alpha\-\_\-shape generator. \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_a82d499b2844c4caf6e3d29e242edd1d8}{vagueplaces.\-write\-\_\-file\-\_\-csv}
-\item 
+\begin{DoxyCompactList}\small\item\em \-Writes a \-C\-S\-V file to be opened by a \-G\-I\-S software. \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_aaebf90c401271b3c8426734be3676964}{vagueplaces.\-write\-\_\-file}
-\item 
+\begin{DoxyCompactList}\small\item\em \-Write a file (fileh) with the format (wf). \end{DoxyCompactList}\item 
 def \hyperlink{namespacevagueplaces_ae8bd8113632ad176c928b0b2871460c4}{vagueplaces.\-kill\-\_\-handler}
-\begin{DoxyCompactList}\small\item\em \-S\-I\-G\-N\-A\-L \-H\-A\-N\-D\-L\-I\-N\-G. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{DoxyCompactItemize}
 \subsection*{\-Variables}
 \begin{DoxyCompactItemize}
 \item 
 tuple \hyperlink{namespacevagueplaces_a12260e069d767b0750c1e8f31af9cefb}{vagueplaces.\-parser} = argparse.\-Argument\-Parser(description='\-C\-S\-V generation with name;point;country querying dbpedia')
-\begin{DoxyCompactList}\small\item\em \-A\-R\-G\-U\-M\-E\-N\-T \-P\-A\-R\-S\-I\-N\-G. \end{DoxyCompactList}\item 
-string \hyperlink{namespacevagueplaces_a23c662171941a2348ade72200850b133}{vagueplaces.\-help} = '\-Query to filter from the \-Abstract results'
+\item 
+string \hyperlink{namespacevagueplaces_a23c662171941a2348ade72200850b133}{vagueplaces.\-help} = '\-List of keywords to filter from the \-Abstract results. \-Interpreted as \-Logical disjunction'
 \item 
 string \hyperlink{namespacevagueplaces_aacfed2e477d0a97080d7d50fb875619e}{vagueplaces.\-dest} = 'live\-\_\-bool'
 \item 
 tuple \hyperlink{namespacevagueplaces_a3f96b3b895dcb14f99c0348f7c35f90a}{vagueplaces.\-arguments} = parser.\-parse\-\_\-args()
 \item 
-\hyperlink{namespacevagueplaces_afc402b26135ad61137fcb1208053cbf8}{vagueplaces.\-query} = arguments.\-stringval
-\begin{DoxyCompactList}\small\item\em \-I\-N\-I\-T\-I\-A\-L\-I\-Z\-A\-T\-I\-O\-N\-S. \end{DoxyCompactList}\item 
+\hyperlink{namespacevagueplaces_ac63c57bd9dfe86d7d5ff61f7e0d85a39}{vagueplaces.\-query\-\_\-list} = arguments.\-stringval
+\item 
 \hyperlink{namespacevagueplaces_a206384d666558c145679f9ecdb3dd7c5}{vagueplaces.\-O\-F} = arguments.\-C\-S\-V\-\_\-\-P\-O\-I\-N\-T\-\_\-\-O\-U\-T\-P\-U\-T
 \item 
 \hyperlink{namespacevagueplaces_a968c6f69551718c27a9617d123ac04b0}{vagueplaces.\-alpha} = arguments.\-floatval
@@ -54,23 +54,23 @@ int \hyperlink{namespacevagueplaces_a07cd0ae682261d720780294aba9e03f4}{vagueplac
 \item 
 list \hyperlink{namespacevagueplaces_a611b348baa6cc63b93677dea3e188397}{vagueplaces.\-P\-L\-A\-C\-E\-S} = \mbox{[}$\,$\mbox{]}
 \item 
-tuple \hyperlink{namespacevagueplaces_a327d24ca861ef2c176f7c29da06d2da8}{vagueplaces.\-sparql} = \-S\-P\-A\-R\-Q\-L\-Wrapper(\char`\"{}http\-://live.\-dbpedia.\-org/sparql\char`\"{})
+tuple \hyperlink{namespacevagueplaces_a327d24ca861ef2c176f7c29da06d2da8}{vagueplaces.\-sparql} = \-S\-P\-A\-R\-Q\-L\-Wrapper(\char`\"{}http\-://dbpedia-\/live.\-openlinksw.\-com/sparql\char`\"{})
 \item 
 tuple \hyperlink{namespacevagueplaces_a62d09a13c6d9f03428f5a6992dd10644}{vagueplaces.\-S} = \hyperlink{classcSpinner_1_1cSpinner}{c\-Spinner.\-c\-Spinner}()
 \item 
 tuple \hyperlink{namespacevagueplaces_a480d6041ef085842ab19117d6c95fc9c}{vagueplaces.\-R\-E\-P\-O\-R\-T} = \hyperlink{classcReport_1_1cReport}{c\-Report.\-c\-Report}()
 \item 
 list \hyperlink{namespacevagueplaces_aed19f140324bfa70b0d22d5078ed1a33}{vagueplaces.\-country\-\_\-uri} = country\mbox{[}\char`\"{}place\char`\"{}\mbox{]}
-\begin{DoxyCompactList}\small\item\em \-S\-T\-A\-R\-T. \end{DoxyCompactList}\item 
+\item 
 tuple \hyperlink{namespacevagueplaces_a439323fd94d6776127c4d46f50242309}{vagueplaces.\-country\-\_\-name} = country\-\_\-uri.\-rpartition('/')
 \item 
 int \hyperlink{namespacevagueplaces_aa2411570d3d42e5c2daf01af8c980b20}{vagueplaces.\-total\-\_\-results} = 0
 \item 
-int \hyperlink{namespacevagueplaces_a22c8a6a4861b99a18d096217c04a39af}{vagueplaces.\-query\-\_\-results} = 1
-\item 
 int \hyperlink{namespacevagueplaces_aedee1b25605e448202ade844e392b896}{vagueplaces.\-offset} = 0
 \item 
-tuple \hyperlink{namespacevagueplaces_a05416e0b132e478c479ed1fba77ad4a8}{vagueplaces.\-country\-\_\-results} = get\-\_\-points(country\-\_\-uri,query,offset,\-R\-E\-S\-U\-L\-T\-S\-\_\-\-Q\-U\-E\-R\-Y)
+int \hyperlink{namespacevagueplaces_a22c8a6a4861b99a18d096217c04a39af}{vagueplaces.\-query\-\_\-results} = 1
+\item 
+tuple \hyperlink{namespacevagueplaces_a05416e0b132e478c479ed1fba77ad4a8}{vagueplaces.\-country\-\_\-results} = get\-\_\-points(country\-\_\-uri,query\-\_\-list,offset,\-R\-E\-S\-U\-L\-T\-S\-\_\-\-Q\-U\-E\-R\-Y)
 \item 
 list \hyperlink{namespacevagueplaces_a967dc293801b4684884a9841274c9591}{vagueplaces.\-title} = result\mbox{[}\char`\"{}title\char`\"{}\mbox{]}
 \item 
@@ -83,4 +83,4 @@ list \hyperlink{namespacevagueplaces_a95b2086442c1258ddf336e75265f6885}{vaguepla
 string \hyperlink{namespacevagueplaces_af80846e508540f2e094cdcfd30da1eeb}{vagueplaces.\-abstract} = \char`\"{}\char`\"{}
 \item 
 tuple \hyperlink{namespacevagueplaces_a3b9ac6b99db27960b0431390dcd551cd}{vagueplaces.\-tmpfile} = tempfile.\-Named\-Temporary\-File(prefix='vagueplace',delete=\-False)
-\begin{DoxyCompactList}\small\item\em \-P\-O\-L\-Y\-G\-O\-N \-G\-E\-N\-E\-R\-A\-T\-I\-O\-N. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{DoxyCompactItemize}

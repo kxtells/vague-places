@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.5.24)  7 AUG 2012 16:53
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.5.24)  8 AUG 2012 18:01
 entering extended mode
  %&-line parsing enabled.
 **refman
@@ -970,15 +970,17 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 
 ]
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <7> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 59.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 58.
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 6.29996pt on input line 59.
- [2] [3] [4] [5])
+(Font)              scaled to size 6.29996pt on input line 58.
+ [2] [3] [4])
 \tf@toc=\write5
 \openout5 = `refman.toc'.
 
+ [5]
+[6
 
-[6]
+]
 Package hyperref Info: Option `pageanchor' set `true' on input line 63.
 
 Chapter 1.
@@ -990,6 +992,12 @@ LaTeX Font Info:    Font shape `T1/phv/b/n' will be
 (Font)              scaled to size 18.66588pt on input line 64.
 LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
 (Font)              scaled to size 18.66588pt on input line 64.
+(./todo.tex) [1
+
+] [2
+
+]
+Chapter 2.
 (./namespaces.tex
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/phv/b/n' tried instead on input line 1.
@@ -997,22 +1005,19 @@ LaTeX Font Info:    Font shape `T1/phv/b/n' will be
 (Font)              scaled to size 12.9599pt on input line 1.
 LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
 (Font)              scaled to size 12.9599pt on input line 1.
-) [1
-
-
-] [2
-
-]
-Chapter 2.
-(./annotated.tex) [3] [4
+) [3] [4
 
 ]
 Chapter 3.
-(./files.tex) [5] [6
+(./annotated.tex) [5] [6
 
 ]
 Chapter 4.
-(./namespacealldbpediapoints.tex
+(./files.tex) [7] [8
+
+]
+Chapter 5.
+(./namespacecPlace.tex
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
 (Font)              Font shape `T1/phv/b/n' tried instead on input line 4.
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
@@ -1020,8 +1025,7 @@ LaTeX Font Info:    Font shape `T1/phv/b/n' will be
 LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
 (Font)              scaled to size 10.79993pt on input line 4.
 LaTeX Font Info:    Try loading font information for TS1+phv on input line 7.
-
-(/usr/share/texmf-texlive/tex/latex/psnfss/ts1phv.fd
+ (/usr/share/texmf-texlive/tex/latex/psnfss/ts1phv.fd
 File: ts1phv.fd 2001/06/04 scalable font definitions for TS1/phv.
 )
 LaTeX Font Info:    Font shape `TS1/phv/m/n' will be
@@ -1030,113 +1034,168 @@ LaTeX Font Info:    Font shape `T1/phv/m/it' in size <9> not available
 (Font)              Font shape `T1/phv/m/sl' tried instead on input line 8.
 LaTeX Font Info:    Font shape `T1/phv/m/sl' will be
 (Font)              scaled to size 8.09995pt on input line 8.
-
-Underfull \hbox (badness 3049) in paragraph at lines 23--24
-[]\T1/phv/m/n/10 tuple [][]parser[][] = argparse.-Argument-Parser(description='
--C-S-V gen-er-a-tion with
- []
-
-[7]
+)
+(./namespacecReport.tex) (./namespacecSpinner.tex)
+(./namespacegeom__functions.tex [9]
 LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
-(Font)              scaled to size 8.99994pt on input line 60.
+(Font)              scaled to size 8.99994pt on input line 21.
 LaTeX Font Info:    Font shape `OT1/phv/bc/it' in size <10> not available
-(Font)              Font shape `OT1/phv/bc/sl' tried instead on input line 71.
+(Font)              Font shape `OT1/phv/bc/sl' tried instead on input line 21.
 LaTeX Font Info:    Font shape `OT1/phv/bc/sl' will be
-(Font)              scaled to size 8.99994pt on input line 71.
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 7.19995pt on input line 72.
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 72.
- (/usr/share/texmf-texlive/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-) [8])
-(./namespacecPlace.tex) (./namespacecReport.tex) (./namespacecSpinner.tex)
-(./namespacegeom__functions.tex
-Overfull \hbox (43.80025pt too wide) in paragraph at lines 23--23
-[]    \T1/pcr/m/n/8 External system execution of alpha_shaper to generate a WKT
- alpha shape file. 
- []
-
-
-Overfull \hbox (29.40024pt too wide) in paragraph at lines 24--24
-[]    \T1/pcr/m/n/8 Expects a CGAL file with lon lat corrdinates and the first 
-line an integer[] 
- []
-
-[9]) (./namespacevagueplaces.tex
-Underfull \hbox (badness 3049) in paragraph at lines 30--31
+(Font)              scaled to size 8.99994pt on input line 21.
+) (./namespacevagueplaces.tex
+Underfull \hbox (badness 3049) in paragraph at lines 30--32
 []\T1/phv/m/n/10 tuple [][]parser[][] = argparse.-Argument-Parser(description='
 -C-S-V gen-er-a-tion with
  []
 
-[10]
-Underfull \hbox (badness 10000) in paragraph at lines 80--81
-[]\T1/phv/m/n/10 tuple [][]tmp-file[][] = tempfile.-Named-Temporary-File(prefix
-='vagueplace',delete=-
+[10] [11]
+LaTeX Font Info:    Font shape `T1/phv/m/it' in size <10> not available
+(Font)              Font shape `T1/phv/m/sl' tried instead on input line 174.
+LaTeX Font Info:    Font shape `T1/phv/m/sl' will be
+(Font)              scaled to size 8.99994pt on input line 174.
+
+Underfull \vbox (badness 10000) detected at line 182
  []
 
-
-Overfull \hbox (43.80025pt too wide) in paragraph at lines 119--119
-[]    \T1/pcr/m/n/8 External system execution of alpha_shaper to generate a WKT
- alpha shape file. 
- []
-
-
-Overfull \hbox (29.40024pt too wide) in paragraph at lines 120--120
-[]    \T1/pcr/m/n/8 Expects a CGAL file with lon lat corrdinates and the first 
-line an integer[] 
- []
-
-[11] [12]) [13] [14
+[12] [13] [14]) [15] [16
 
 ]
-Chapter 5.
-(./classcPlace_1_1cPlace.tex [15]) (./classcReport_1_1cReport.tex [16]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 169.
+Chapter 6.
+(./classcPlace_1_1cPlace.tex [17]
+Underfull \vbox (badness 10000) detected at line 67
+ []
 
+) (./classcReport_1_1cReport.tex [18]
+Underfull \vbox (badness 10000) detected at line 76
+ []
+
+[19]
+Underfull \vbox (badness 10000) detected at line 113
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 134
+ []
+
+) (./classcSpinner_1_1cSpinner.tex [20] [21]
+Underfull \vbox (badness 10000) detected at line 98
+ []
+
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 138.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 
 LaTeX Font Warning: Font shape `OT1/pcr/bc/n' undefined
-(Font)              using `OT1/pcr/m/n' instead on input line 169.
+(Font)              using `OT1/pcr/m/n' instead on input line 138.
 
-[17]) (./classcSpinner_1_1cSpinner.tex [18])
-(./classalldbpediapoints_1_1cSpinner.tex [19] [20]) [21] [22
+[22]) [23] [24
 
 ]
-Chapter 6.
-(./alldbpediapoints_8py.tex [23]) (./cPlace_8py.tex) (./cReport_8py.tex)
-(./cSpinner_8py.tex) (./geom__functions_8py.tex [24]) (./vagueplaces_8py.tex
+Chapter 7.
+(./main_8cpp.tex
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 4.
+ (/usr/share/texmf-texlive/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+)
+Underfull \hbox (badness 10000) in paragraph at lines 4--14
+\T1/pcr/m/n/10 #include $\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 -C-G-A-L/-Exact-_-
+predicates-_-inexact-_-constructions-_-
+ []
+
+
+Overfull \hbox (26.44777pt too wide) in paragraph at lines 4--14
+\T1/pcr/m/n/10 kernel.-h$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/pcr/m/n
+/10 #include $\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 -C-G-A-L/-Exact-_-predicates-
+_-exact-_-constructions-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--14
+\T1/pcr/m/n/10 _-kernel.-h$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/pcr/m
+/n/10 #include $\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 -C-G-A-L/algorithm.-h$\OML/
+ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/pcr/m/n/10 #include $\OML/ztmcm/m/it/
+10 <$\T1/pcr/m/n/10 -C-G-A-L/-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--14
+\T1/pcr/m/n/10 Delaunay-_-triangulation-_-2.-h$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/
+m/n/10 ^^B \T1/pcr/m/n/10 #include $\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 -C-G-A-
+L/-Alpha-_-shape-_-
+ []
+
+
+Underfull \hbox (badness 4569) in paragraph at lines 4--14
+\T1/pcr/m/n/10 2.-h$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/pcr/m/n/10 #
+include $\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 -C-G-A-L/-Boolean-_-set-_-operatio
+ns-_-2.-h$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/pcr/m/n/10 #include
+ []
+
+
+Underfull \hbox (badness 776) in paragraph at lines 4--14
+\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 iostream$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/
+n/10 ^^B \T1/pcr/m/n/10 #include $\OML/ztmcm/m/it/10 <$\T1/pcr/m/n/10 fstream$\
+OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/pcr/m/n/10 #include $\OML/ztmcm/m
+/it/10 <$\T1/pcr/m/n/10 vector$\OML/ztmcm/m/it/10 >$\OMS/ztmcm/m/n/10 ^^B \T1/p
+cr/m/n/10 #include
+ []
+
 [25]
+Underfull \hbox (badness 1248) in paragraph at lines 81--84
+[]\T1/phv/m/n/10 typedef \OMS/ztmcm/m/n/10 ^^B [][]\T1/phv/m/n/10 -Alpha-_-shap
+e-_-2-::-Alpha-_-shape-_-edges-_-iterator[][] [][]-Alpha-_-shape-_-edges-_-
+ []
+
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 7.19995pt on input line 90.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 90.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 90.
+[26] [27] [28] [29]
+Underfull \vbox (badness 10000) detected at line 415
+ []
+
+) (./cPlace_8py.tex [30]) (./cReport_8py.tex) (./cSpinner_8py.tex)
+(./geom__functions_8py.tex [31]) (./vagueplaces_8py.tex [32]
+Underfull \hbox (badness 1496) in paragraph at lines 57--59
+[]\T1/phv/m/n/10 tuple [][]vagueplaces.-sparql[][] = -S-P-A-R-Q-L-Wrapper("http
+-://dbpedia-live.-openlinksw.-
+ []
+
+
 Overfull \hbox (24.97305pt too wide) in paragraph at lines 85--86
 []\T1/phv/m/n/10 tuple [][]vagueplaces.-tmpfile[][] = tempfile.-Named-Temporary
 -File(prefix='vagueplace',delete=-
  []
 
-) (./refman.ind) [26] (./refman.aux)
+) (./refman.ind) [33] (./refman.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 10414 strings out of 495061
- 154359 string characters out of 1182621
+ 10362 strings out of 495061
+ 149816 string characters out of 1182621
  238214 words of memory out of 3000000
- 12978 multiletter control sequences out of 15000+50000
- 57261 words of font info for 74 fonts, out of 3000000 for 9000
+ 12959 multiletter control sequences out of 15000+50000
+ 69921 words of font info for 93 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 41i,13n,58p,583b,496s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 41i,13n,58p,593b,498s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/urw/courier/ucrr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/helvetic/u
-hvb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/helvetic/uhvb8ac.pfb></usr/
-share/texmf-texlive/fonts/type1/urw/helvetic/uhvbo8ac.pfb></usr/share/texmf-tex
-live/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texmf-texlive/fonts/type1/
-urw/helvetic/uhvro8a.pfb>
-Output written on refman.pdf (34 pages, 306497 bytes).
+ve/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/cou
+rier/ucrr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/helvetic/uhvb8a.pfb><
+/usr/share/texmf-texlive/fonts/type1/urw/helvetic/uhvb8ac.pfb></usr/share/texmf
+-texlive/fonts/type1/urw/helvetic/uhvbo8ac.pfb></usr/share/texmf-texlive/fonts/
+type1/urw/helvetic/uhvr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/helveti
+c/uhvro8a.pfb>
+Output written on refman.pdf (41 pages, 307512 bytes).
 PDF statistics:
- 1468 PDF objects out of 1728 (max. 8388607)
- 361 named destinations out of 1000 (max. 500000)
- 1297 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1355 PDF objects out of 1440 (max. 8388607)
+ 323 named destinations out of 1000 (max. 500000)
+ 1105 words of extra memory for PDF output out of 10000 (max. 10000000)
 
