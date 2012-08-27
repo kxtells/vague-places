@@ -1,7 +1,11 @@
 """
- MAIN FILE
+ Vagueplaces Generator
  \author Jordi Castells
  \date 10 August 2012
+ \mainpage 
+
+  This software is implemented as a Final project of a Geoinformatics Master course at ITC Faculty of Geo-Information Science and Earth Observation.
+
 """
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
