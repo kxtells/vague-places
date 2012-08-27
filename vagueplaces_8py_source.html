@@ -44,6 +44,7 @@
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
+<script type="text/javascript" src="dynsections.js"></script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
@@ -83,301 +84,305 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 <a href="vagueplaces_8py.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a><a class="code" href="namespacevagueplaces.html">00001</a> <span class="comment">##</span>
 <a name="l00002"></a>00002 <span class="comment"># </span>
-<a name="l00003"></a>00003 <span class="comment">#  MAIN FILE</span>
+<a name="l00003"></a>00003 <span class="comment">#  Vagueplaces Generator</span>
 <a name="l00004"></a>00004 <span class="comment">#  \author Jordi Castells</span>
 <a name="l00005"></a>00005 <span class="comment">#  \date 10 August 2012</span>
-<a name="l00006"></a>00006 <span class="comment"># </span>
-<a name="l00007"></a>00007 <span class="keyword">from</span> SPARQLWrapper <span class="keyword">import</span> SPARQLWrapper, SPARQLExceptions, JSON
-<a name="l00008"></a>00008 <span class="keyword">import</span> argparse
-<a name="l00009"></a>00009 <span class="keyword">import</span> sys
-<a name="l00010"></a>00010 <span class="keyword">import</span> signal
-<a name="l00011"></a>00011 <span class="keyword">import</span> os
-<a name="l00012"></a>00012 <span class="keyword">import</span> tempfile
-<a name="l00013"></a>00013 
-<a name="l00014"></a>00014 <span class="keyword">import</span> cSpinner
-<a name="l00015"></a>00015 <span class="keyword">import</span> cPlace
-<a name="l00016"></a>00016 <span class="keyword">import</span> cReport
-<a name="l00017"></a>00017 <span class="keyword">import</span> geom_functions <span class="keyword">as</span> GEOM
-<a name="l00018"></a>00018 
-<a name="l00019"></a>00019 <span class="comment"># ###########################</span>
-<a name="l00020"></a>00020 <span class="comment">#</span>
-<a name="l00021"></a>00021 <span class="comment">#  ARGUMENT PARSING</span>
-<a name="l00022"></a>00022 <span class="comment">#</span>
+<a name="l00006"></a>00006 <span class="comment">#  \mainpage </span>
+<a name="l00007"></a>00007 <span class="comment"># </span>
+<a name="l00008"></a>00008 <span class="comment">#   This software is implemented as a Final project of a Geoinformatics Master course at ITC Faculty of Geo-Information Science and Earth Observation.</span>
+<a name="l00009"></a>00009 <span class="comment"># </span>
+<a name="l00010"></a>00010 <span class="comment"># </span>
+<a name="l00011"></a>00011 <span class="keyword">from</span> SPARQLWrapper <span class="keyword">import</span> SPARQLWrapper, SPARQLExceptions, JSON
+<a name="l00012"></a>00012 <span class="keyword">import</span> argparse
+<a name="l00013"></a>00013 <span class="keyword">import</span> sys
+<a name="l00014"></a>00014 <span class="keyword">import</span> signal
+<a name="l00015"></a>00015 <span class="keyword">import</span> os
+<a name="l00016"></a>00016 <span class="keyword">import</span> tempfile
+<a name="l00017"></a>00017 
+<a name="l00018"></a>00018 <span class="keyword">import</span> cSpinner
+<a name="l00019"></a>00019 <span class="keyword">import</span> cPlace
+<a name="l00020"></a>00020 <span class="keyword">import</span> cReport
+<a name="l00021"></a>00021 <span class="keyword">import</span> geom_functions <span class="keyword">as</span> GEOM
+<a name="l00022"></a>00022 
 <a name="l00023"></a>00023 <span class="comment"># ###########################</span>
-<a name="l00024"></a>00024 
-<a name="l00025"></a><a class="code" href="namespacevagueplaces.html#a12260e069d767b0750c1e8f31af9cefb">00025</a> parser = argparse.ArgumentParser(description=<span class="stringliteral">&#39;CSV generation with name;point;country querying dbpedia&#39;</span>)
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 parser.add_argument(<span class="stringliteral">&#39;--query&#39;</span>, action=<span class="stringliteral">&#39;store&#39;</span>, dest=<span class="stringliteral">&#39;stringval&#39;</span>, default=<span class="keywordtype">None</span>,nargs=<span class="stringliteral">&#39;+&#39;</span>,
-<a name="l00028"></a><a class="code" href="namespacevagueplaces.html#a23c662171941a2348ade72200850b133">00028</a>                     help=<span class="stringliteral">&#39;List of keywords to filter from the Abstract results. Interpreted as Logical disjunction&#39;</span>)
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030 parser.add_argument(<span class="stringliteral">&#39;--alpha&#39;</span>,type=float,default=0.1,dest=<span class="stringliteral">&#39;floatval&#39;</span>)
-<a name="l00031"></a>00031 
-<a name="l00032"></a>00032 parser.add_argument(<span class="stringliteral">&#39;CSV_POINT_OUTPUT&#39;</span>, type=argparse.FileType(<span class="stringliteral">&#39;wb&#39;</span>, 0),
-<a name="l00033"></a>00033                     help=<span class="stringliteral">&#39;Retrieved points file out as CSV.&#39;</span>)
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 parser.add_argument(<span class="stringliteral">&#39;--live&#39;</span>, action=<span class="stringliteral">&#39;store_true&#39;</span>,default=<span class="keyword">False</span>,
-<a name="l00036"></a><a class="code" href="namespacevagueplaces.html#aacfed2e477d0a97080d7d50fb875619e">00036</a>                     dest=<span class="stringliteral">&#39;live_bool&#39;</span>,
-<a name="l00037"></a>00037                     help=<span class="stringliteral">&#39;Use Dbpedia live SPARQL endpoint instead of last released version&#39;</span>)
+<a name="l00024"></a>00024 <span class="comment">#</span>
+<a name="l00025"></a>00025 <span class="comment">#  ARGUMENT PARSING</span>
+<a name="l00026"></a>00026 <span class="comment">#</span>
+<a name="l00027"></a>00027 <span class="comment"># ###########################</span>
+<a name="l00028"></a>00028 
+<a name="l00029"></a><a class="code" href="namespacevagueplaces.html#a12260e069d767b0750c1e8f31af9cefb">00029</a> parser = argparse.ArgumentParser(description=<span class="stringliteral">&#39;CSV generation with name;point;country querying dbpedia&#39;</span>)
+<a name="l00030"></a>00030 
+<a name="l00031"></a>00031 parser.add_argument(<span class="stringliteral">&#39;--query&#39;</span>, action=<span class="stringliteral">&#39;store&#39;</span>, dest=<span class="stringliteral">&#39;stringval&#39;</span>, default=<span class="keywordtype">None</span>,nargs=<span class="stringliteral">&#39;+&#39;</span>,
+<a name="l00032"></a><a class="code" href="namespacevagueplaces.html#a23c662171941a2348ade72200850b133">00032</a>                     help=<span class="stringliteral">&#39;List of keywords to filter from the Abstract results. Interpreted as Logical disjunction&#39;</span>)
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 parser.add_argument(<span class="stringliteral">&#39;--alpha&#39;</span>,type=float,default=0.1,dest=<span class="stringliteral">&#39;floatval&#39;</span>)
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 parser.add_argument(<span class="stringliteral">&#39;CSV_POINT_OUTPUT&#39;</span>, type=argparse.FileType(<span class="stringliteral">&#39;wb&#39;</span>, 0),
+<a name="l00037"></a>00037                     help=<span class="stringliteral">&#39;Retrieved points file out as CSV.&#39;</span>)
 <a name="l00038"></a>00038 
-<a name="l00039"></a>00039 parser.add_argument(<span class="stringliteral">&#39;--verbose&#39;</span>, action=<span class="stringliteral">&#39;store_true&#39;</span>, default=<span class="keyword">False</span>,
-<a name="l00040"></a>00040                     dest=<span class="stringliteral">&#39;debug_bool&#39;</span>,
-<a name="l00041"></a>00041                     help=<span class="stringliteral">&#39;Verbose output&#39;</span>)
+<a name="l00039"></a>00039 parser.add_argument(<span class="stringliteral">&#39;--live&#39;</span>, action=<span class="stringliteral">&#39;store_true&#39;</span>,default=<span class="keyword">False</span>,
+<a name="l00040"></a><a class="code" href="namespacevagueplaces.html#aacfed2e477d0a97080d7d50fb875619e">00040</a>                     dest=<span class="stringliteral">&#39;live_bool&#39;</span>,
+<a name="l00041"></a>00041                     help=<span class="stringliteral">&#39;Use Dbpedia live SPARQL endpoint instead of last released version&#39;</span>)
 <a name="l00042"></a>00042 
-<a name="l00043"></a><a class="code" href="namespacevagueplaces.html#a3f96b3b895dcb14f99c0348f7c35f90a">00043</a> arguments  = parser.parse_args()
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046 <span class="comment"># ###########################</span>
-<a name="l00047"></a>00047 <span class="comment">#</span>
-<a name="l00048"></a>00048 <span class="comment">#  INITIALIZATIONS</span>
-<a name="l00049"></a>00049 <span class="comment">#</span>
+<a name="l00043"></a>00043 parser.add_argument(<span class="stringliteral">&#39;--verbose&#39;</span>, action=<span class="stringliteral">&#39;store_true&#39;</span>, default=<span class="keyword">False</span>,
+<a name="l00044"></a>00044                     dest=<span class="stringliteral">&#39;debug_bool&#39;</span>,
+<a name="l00045"></a>00045                     help=<span class="stringliteral">&#39;Verbose output&#39;</span>)
+<a name="l00046"></a>00046 
+<a name="l00047"></a><a class="code" href="namespacevagueplaces.html#a3f96b3b895dcb14f99c0348f7c35f90a">00047</a> arguments  = parser.parse_args()
+<a name="l00048"></a>00048 
+<a name="l00049"></a>00049 
 <a name="l00050"></a>00050 <span class="comment"># ###########################</span>
-<a name="l00051"></a><a class="code" href="namespacevagueplaces.html#ac63c57bd9dfe86d7d5ff61f7e0d85a39">00051</a> query_list = arguments.stringval
-<a name="l00052"></a><a class="code" href="namespacevagueplaces.html#a206384d666558c145679f9ecdb3dd7c5">00052</a> OF = arguments.CSV_POINT_OUTPUT
-<a name="l00053"></a><a class="code" href="namespacevagueplaces.html#a968c6f69551718c27a9617d123ac04b0">00053</a> alpha = arguments.floatval
-<a name="l00054"></a><a class="code" href="namespacevagueplaces.html#a4dcc7b9604e1fd16000c4f36becf8697">00054</a> isdebug = arguments.debug_bool
-<a name="l00055"></a><a class="code" href="namespacevagueplaces.html#ae377bfacd073c19ab35ff25f123eab1a">00055</a> islive = arguments.live_bool
-<a name="l00056"></a><a class="code" href="namespacevagueplaces.html#a07cd0ae682261d720780294aba9e03f4">00056</a> RESULTS_QUERY = 500000
-<a name="l00057"></a><a class="code" href="namespacevagueplaces.html#a611b348baa6cc63b93677dea3e188397">00057</a> PLACES = []
-<a name="l00058"></a>00058 
-<a name="l00059"></a>00059 <span class="comment">#sparql endpoint</span>
-<a name="l00060"></a>00060 <span class="keywordflow">if</span> islive:
-<a name="l00061"></a>00061     <span class="comment">#sparql = SPARQLWrapper(&quot;http://live.dbpedia.org/sparql&quot;)</span>
-<a name="l00062"></a><a class="code" href="namespacevagueplaces.html#a327d24ca861ef2c176f7c29da06d2da8">00062</a>     sparql = SPARQLWrapper(<span class="stringliteral">&quot;http://dbpedia-live.openlinksw.com/sparql&quot;</span>)
-<a name="l00063"></a>00063 <span class="keywordflow">else</span>:
-<a name="l00064"></a>00064     sparql = SPARQLWrapper(<span class="stringliteral">&quot;http://dbpedia.org/sparql&quot;</span>)
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066 <span class="comment">#Spinner</span>
-<a name="l00067"></a><a class="code" href="namespacevagueplaces.html#a62d09a13c6d9f03428f5a6992dd10644">00067</a> S = cSpinner.cSpinner()
-<a name="l00068"></a>00068 S.set_msg(<span class="stringliteral">&quot;loading&quot;</span>)
-<a name="l00069"></a>00069 S.start()
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071 <span class="comment">#report</span>
-<a name="l00072"></a><a class="code" href="namespacevagueplaces.html#a480d6041ef085842ab19117d6c95fc9c">00072</a> REPORT = cReport.cReport();
-<a name="l00073"></a>00073 REPORT.set_query(str(query_list));
-<a name="l00074"></a>00074 REPORT.set_points_filename(os.path.realpath(str(OF.name)));
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076 <span class="comment"># ###########################</span>
-<a name="l00077"></a>00077 <span class="comment">#</span>
-<a name="l00078"></a>00078 <span class="comment">#  FUNCTIONS</span>
-<a name="l00079"></a>00079 <span class="comment">#</span>
+<a name="l00051"></a>00051 <span class="comment">#</span>
+<a name="l00052"></a>00052 <span class="comment">#  INITIALIZATIONS</span>
+<a name="l00053"></a>00053 <span class="comment">#</span>
+<a name="l00054"></a>00054 <span class="comment"># ###########################</span>
+<a name="l00055"></a><a class="code" href="namespacevagueplaces.html#ac63c57bd9dfe86d7d5ff61f7e0d85a39">00055</a> query_list = arguments.stringval
+<a name="l00056"></a><a class="code" href="namespacevagueplaces.html#a206384d666558c145679f9ecdb3dd7c5">00056</a> OF = arguments.CSV_POINT_OUTPUT
+<a name="l00057"></a><a class="code" href="namespacevagueplaces.html#a968c6f69551718c27a9617d123ac04b0">00057</a> alpha = arguments.floatval
+<a name="l00058"></a><a class="code" href="namespacevagueplaces.html#a4dcc7b9604e1fd16000c4f36becf8697">00058</a> isdebug = arguments.debug_bool
+<a name="l00059"></a><a class="code" href="namespacevagueplaces.html#ae377bfacd073c19ab35ff25f123eab1a">00059</a> islive = arguments.live_bool
+<a name="l00060"></a><a class="code" href="namespacevagueplaces.html#a07cd0ae682261d720780294aba9e03f4">00060</a> RESULTS_QUERY = 500000
+<a name="l00061"></a><a class="code" href="namespacevagueplaces.html#a611b348baa6cc63b93677dea3e188397">00061</a> PLACES = []
+<a name="l00062"></a>00062 
+<a name="l00063"></a>00063 <span class="comment">#sparql endpoint</span>
+<a name="l00064"></a>00064 <span class="keywordflow">if</span> islive:
+<a name="l00065"></a>00065     <span class="comment">#sparql = SPARQLWrapper(&quot;http://live.dbpedia.org/sparql&quot;)</span>
+<a name="l00066"></a><a class="code" href="namespacevagueplaces.html#a327d24ca861ef2c176f7c29da06d2da8">00066</a>     sparql = SPARQLWrapper(<span class="stringliteral">&quot;http://dbpedia-live.openlinksw.com/sparql&quot;</span>)
+<a name="l00067"></a>00067 <span class="keywordflow">else</span>:
+<a name="l00068"></a>00068     sparql = SPARQLWrapper(<span class="stringliteral">&quot;http://dbpedia.org/sparql&quot;</span>)
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="comment">#Spinner</span>
+<a name="l00071"></a><a class="code" href="namespacevagueplaces.html#a62d09a13c6d9f03428f5a6992dd10644">00071</a> S = cSpinner.cSpinner()
+<a name="l00072"></a>00072 S.set_msg(<span class="stringliteral">&quot;loading&quot;</span>)
+<a name="l00073"></a>00073 S.start()
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 <span class="comment">#report</span>
+<a name="l00076"></a><a class="code" href="namespacevagueplaces.html#a480d6041ef085842ab19117d6c95fc9c">00076</a> REPORT = cReport.cReport();
+<a name="l00077"></a>00077 REPORT.set_query(str(query_list));
+<a name="l00078"></a>00078 REPORT.set_points_filename(os.path.realpath(str(OF.name)));
+<a name="l00079"></a>00079 
 <a name="l00080"></a>00080 <span class="comment"># ###########################</span>
-<a name="l00081"></a>00081 <span class="comment">##</span>
-<a name="l00082"></a>00082 <span class="comment"># </span>
-<a name="l00083"></a>00083 <span class="comment">#         Retrieve an europe country list from DBpedia with URIs.</span>
-<a name="l00084"></a>00084 <span class="comment">#         @return List with country URIS</span>
-<a name="l00085"></a>00085 <span class="comment">#     </span>
-<a name="l00086"></a><a class="code" href="namespacevagueplaces.html#adec54b9e74dc2de30d17a2fe161f137c">00086</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#adec54b9e74dc2de30d17a2fe161f137c" title="Retrieve an europe country list from DBpedia with URIs.">european_countries</a>():
-<a name="l00087"></a>00087     sparql.setReturnFormat(JSON)
-<a name="l00088"></a>00088     
-<a name="l00089"></a>00089     sparql.setQuery(<span class="stringliteral">&quot;&quot;&quot;</span>
-<a name="l00090"></a>00090 <span class="stringliteral">                    PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
-<a name="l00091"></a>00091 <span class="stringliteral">                    PREFIX yago: &lt;http://dbpedia.org/class/yago/&gt;</span>
-<a name="l00092"></a>00092 <span class="stringliteral">                    PREFIX dbpedia-owl: &lt;http://dbpedia.org/ontology/&gt;</span>
-<a name="l00093"></a>00093 <span class="stringliteral">    </span>
-<a name="l00094"></a>00094 <span class="stringliteral">                    SELECT DISTINCT ?place WHERE {</span>
-<a name="l00095"></a>00095 <span class="stringliteral">                        ?place rdf:type yago:EuropeanCountries .</span>
-<a name="l00096"></a>00096 <span class="stringliteral">                        ?place rdf:type dbpedia-owl:Country</span>
-<a name="l00097"></a>00097 <span class="stringliteral">                    }</span>
-<a name="l00098"></a>00098 <span class="stringliteral">                    &quot;&quot;&quot;</span>
-<a name="l00099"></a>00099     )
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101     results = sparql.query().convert()
-<a name="l00102"></a>00102     <span class="keywordflow">return</span> results[<span class="stringliteral">&quot;results&quot;</span>][<span class="stringliteral">&quot;bindings&quot;</span>]
-<a name="l00103"></a>00103 
-<a name="l00104"></a>00104 <span class="comment">##</span>
-<a name="l00105"></a>00105 <span class="comment"># </span>
-<a name="l00106"></a>00106 <span class="comment">#         Retrieve a list of points from DBpedia matching the input.</span>
-<a name="l00107"></a>00107 <span class="comment">#         \param country_uri country to query</span>
-<a name="l00108"></a>00108 <span class="comment">#         \param query substring to check in the Abstract</span>
-<a name="l00109"></a>00109 <span class="comment">#         \param offset Offset to start retrieving</span>
-<a name="l00110"></a>00110 <span class="comment">#         \param limit Limit of lines to retrieve</span>
-<a name="l00111"></a>00111 <span class="comment">#         \return List with points with title,geolat,geolong</span>
-<a name="l00112"></a>00112 <span class="comment">#     </span>
-<a name="l00113"></a><a class="code" href="namespacevagueplaces.html#aed235c5c580e7ab436215ad07be55b27">00113</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#aed235c5c580e7ab436215ad07be55b27" title="Retrieve a list of points from DBpedia matching the input.">get_points</a>(country_uri,query_list,offset,limit):
-<a name="l00114"></a>00114     regex_list = []
-<a name="l00115"></a>00115     <span class="keywordflow">for</span> q <span class="keywordflow">in</span> query_list:
-<a name="l00116"></a>00116         regex_list.append(<span class="stringliteral">&quot;&quot;&quot;regex(?abstract,\&quot; &quot;&quot;&quot;</span>+str(q)+<span class="stringliteral">&quot;&quot;&quot;\&quot;,&quot;i&quot;) &quot;&quot;&quot;</span>)
-<a name="l00117"></a>00117 
-<a name="l00118"></a>00118     query = <span class="stringliteral">&quot;||&quot;</span>.join(regex_list)
-<a name="l00119"></a>00119 
-<a name="l00120"></a>00120     querystr = <span class="stringliteral">&quot;&quot;&quot;</span>
-<a name="l00121"></a>00121 <span class="stringliteral">        SELECT DISTINCT ?title,?geolat,?geolong</span>
-<a name="l00122"></a>00122 <span class="stringliteral">        WHERE{</span>
-<a name="l00123"></a>00123 <span class="stringliteral">          ?place rdf:type dbpedia-owl:Place .</span>
-<a name="l00124"></a>00124 <span class="stringliteral">          ?place dbpedia-owl:country &lt;&quot;&quot;&quot;</span> + country_uri + <span class="stringliteral">&quot;&quot;&quot;&gt; .</span>
-<a name="l00125"></a>00125 <span class="stringliteral">          ?place foaf:name ?title .</span>
-<a name="l00126"></a>00126 <span class="stringliteral">          ?place geo:lat ?geolat .</span>
-<a name="l00127"></a>00127 <span class="stringliteral">          ?place geo:long ?geolong .</span>
-<a name="l00128"></a>00128 <span class="stringliteral">          ?place dbpedia-owl:abstract ?abstract .</span>
-<a name="l00129"></a>00129 <span class="stringliteral">          FILTER (&quot;&quot;&quot;</span>+ query +<span class="stringliteral">&quot;&quot;&quot;)</span>
-<a name="l00130"></a>00130 <span class="stringliteral">        }</span>
-<a name="l00131"></a>00131 <span class="stringliteral">        OFFSET &quot;&quot;&quot;</span> + str(offset) + <span class="stringliteral">&quot;&quot;&quot;</span>
-<a name="l00132"></a>00132 <span class="stringliteral">        LIMIT &quot;&quot;&quot;</span> + str(limit)+ <span class="stringliteral">&quot;&quot;&quot;</span>
-<a name="l00133"></a>00133 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00134"></a>00134 
-<a name="l00135"></a>00135     sparql.setQuery(querystr)
-<a name="l00136"></a>00136     
-<a name="l00137"></a>00137     country_results = sparql.query().convert()
-<a name="l00138"></a>00138     <span class="keywordflow">return</span> country_results[<span class="stringliteral">&quot;results&quot;</span>][<span class="stringliteral">&quot;bindings&quot;</span>]
-<a name="l00139"></a>00139          
-<a name="l00140"></a>00140 <span class="comment">##</span>
-<a name="l00141"></a>00141 <span class="comment"># </span>
-<a name="l00142"></a>00142 <span class="comment">#          \todo gen_heatmap is not implemented</span>
-<a name="l00143"></a>00143 <span class="comment">#     </span>
-<a name="l00144"></a><a class="code" href="namespacevagueplaces.html#a085e07955df048db8ed1621669a4a064">00144</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a085e07955df048db8ed1621669a4a064">gen_heatmap</a>():
-<a name="l00145"></a>00145     <span class="keywordflow">pass</span>
-<a name="l00146"></a>00146 
-<a name="l00147"></a>00147 <span class="comment">##</span>
-<a name="l00148"></a>00148 <span class="comment"># </span>
-<a name="l00149"></a>00149 <span class="comment">#         Generate the convex hull for the report</span>
-<a name="l00150"></a>00150 <span class="comment">#     </span>
-<a name="l00151"></a><a class="code" href="namespacevagueplaces.html#abace2d9a58e6249fea81bb4163cd9ef6">00151</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#abace2d9a58e6249fea81bb4163cd9ef6" title="Generate the convex hull for the report.">gen_convex_hull</a>():
-<a name="l00152"></a>00152     plist = []
-<a name="l00153"></a>00153     
-<a name="l00154"></a>00154     <span class="keywordflow">for</span> p <span class="keywordflow">in</span> PLACES:
-<a name="l00155"></a>00155         plist.append((float(p.lon),float(p.lat)))
-<a name="l00156"></a>00156 
-<a name="l00157"></a>00157     REPORT.set_wkt_chull(GEOM.convex_hull(plist))
-<a name="l00158"></a>00158 
-<a name="l00159"></a>00159 <span class="comment">##</span>
-<a name="l00160"></a>00160 <span class="comment"># </span>
-<a name="l00161"></a>00161 <span class="comment">#         External system execution of alpha_shaper to generate a WKT alpha shape file.</span>
-<a name="l00162"></a>00162 <span class="comment">#         Expects a CGAL file with lon lat corrdinates and the first line an integer</span>
-<a name="l00163"></a>00163 <span class="comment">#         of the total number of lines to read</span>
-<a name="l00164"></a>00164 <span class="comment">#     </span>
-<a name="l00165"></a><a class="code" href="namespacevagueplaces.html#a97ab699f1b7ffdaf4b86a2342cc1bdc3">00165</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a97ab699f1b7ffdaf4b86a2342cc1bdc3" title="External system execution of alpha_shaper to generate a WKT alpha shape file.">gen_alpha_shape</a>(cgalfile,alpha):
-<a name="l00166"></a>00166     opt_alpha,wkt_polygons = GEOM.alpha_shape(cgalfile,alpha);
-<a name="l00167"></a>00167     REPORT.set_alphas(alpha,opt_alpha)
-<a name="l00168"></a>00168     REPORT.set_wkt_ashape(wkt_polygons)
-<a name="l00169"></a>00169 
-<a name="l00170"></a><a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">00170</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">finish_program</a>():
-<a name="l00171"></a>00171     OF.close()
-<a name="l00172"></a>00172     S.stop()
-<a name="l00173"></a>00173     sys.exit(0)
-<a name="l00174"></a>00174 
-<a name="l00175"></a>00175 <span class="comment">##</span>
-<a name="l00176"></a>00176 <span class="comment">#  </span>
-<a name="l00177"></a>00177 <span class="comment">#         Writes a file to be read by cgal alpha_shape generator </span>
-<a name="l00178"></a>00178 <span class="comment">#     </span>
-<a name="l00179"></a><a class="code" href="namespacevagueplaces.html#a31c6bc6970f61bd314e35668a15bfa6f">00179</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a31c6bc6970f61bd314e35668a15bfa6f" title="Writes a file to be read by cgal alpha_shape generator.">write_file_cgal</a>(fileh):
-<a name="l00180"></a>00180     fileh.write(str(len(PLACES))+<span class="stringliteral">&quot;\n&quot;</span>)
-<a name="l00181"></a>00181     <span class="keywordflow">for</span> p <span class="keywordflow">in</span> PLACES:
-<a name="l00182"></a>00182         fileh.write(p.lon+<span class="stringliteral">&quot; &quot;</span>+p.lat+<span class="stringliteral">&quot;\n&quot;</span>)
-<a name="l00183"></a>00183 
-<a name="l00184"></a>00184 <span class="comment">##</span>
-<a name="l00185"></a>00185 <span class="comment">#  </span>
-<a name="l00186"></a>00186 <span class="comment">#         Writes a CSV file to be opened by a GIS software. WKT </span>
-<a name="l00187"></a>00187 <span class="comment">#     </span>
-<a name="l00188"></a><a class="code" href="namespacevagueplaces.html#a82d499b2844c4caf6e3d29e242edd1d8">00188</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a82d499b2844c4caf6e3d29e242edd1d8" title="Writes a CSV file to be opened by a GIS software.">write_file_csv</a>(fileh):
-<a name="l00189"></a>00189     header = <span class="stringliteral">&quot;name;WKT;Country;Abstract\n&quot;</span>
-<a name="l00190"></a>00190     fileh.write(header)
-<a name="l00191"></a>00191 
-<a name="l00192"></a>00192     <span class="keywordflow">for</span> p <span class="keywordflow">in</span> PLACES:
-<a name="l00193"></a>00193         fileh.write(p.name+<span class="stringliteral">&quot;; POINT(&quot;</span>+p.lon+<span class="stringliteral">&quot; &quot;</span>+p.lat+<span class="stringliteral">&quot;);&quot;</span>+p.country+<span class="stringliteral">&quot;;&quot;</span>+p.text+<span class="stringliteral">&quot;\n&quot;</span>)
-<a name="l00194"></a>00194 
-<a name="l00195"></a>00195 <span class="comment">##</span>
-<a name="l00196"></a>00196 <span class="comment">#  </span>
-<a name="l00197"></a>00197 <span class="comment">#         Write a file (fileh) with the format (wf). Accepting csv and cgal</span>
-<a name="l00198"></a>00198 <span class="comment">#     </span>
-<a name="l00199"></a><a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964">00199</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964" title="Write a file (fileh) with the format (wf).">write_file</a>(fileh,wf):
-<a name="l00200"></a>00200     <span class="keywordflow">if</span> wf.lower() == <span class="stringliteral">&#39;cgal&#39;</span>:
-<a name="l00201"></a>00201         <a class="code" href="namespacevagueplaces.html#a31c6bc6970f61bd314e35668a15bfa6f" title="Writes a file to be read by cgal alpha_shape generator.">write_file_cgal</a>(fileh)
-<a name="l00202"></a>00202     <span class="keywordflow">elif</span> wf.lower() == <span class="stringliteral">&#39;csv&#39;</span>:
-<a name="l00203"></a>00203         <a class="code" href="namespacevagueplaces.html#a82d499b2844c4caf6e3d29e242edd1d8" title="Writes a CSV file to be opened by a GIS software.">write_file_csv</a>(fileh)
-<a name="l00204"></a>00204     fileh.close()
-<a name="l00205"></a>00205 
-<a name="l00206"></a>00206 
-<a name="l00207"></a>00207 <span class="comment"># ###########################</span>
-<a name="l00208"></a>00208 <span class="comment">#</span>
-<a name="l00209"></a>00209 <span class="comment">#  SIGNAL HANDLING</span>
-<a name="l00210"></a>00210 <span class="comment">#</span>
+<a name="l00081"></a>00081 <span class="comment">#</span>
+<a name="l00082"></a>00082 <span class="comment">#  FUNCTIONS</span>
+<a name="l00083"></a>00083 <span class="comment">#</span>
+<a name="l00084"></a>00084 <span class="comment"># ###########################</span>
+<a name="l00085"></a>00085 <span class="comment">##</span>
+<a name="l00086"></a>00086 <span class="comment"># </span>
+<a name="l00087"></a>00087 <span class="comment">#         Retrieve an europe country list from DBpedia with URIs.</span>
+<a name="l00088"></a>00088 <span class="comment">#         @return List with country URIS</span>
+<a name="l00089"></a>00089 <span class="comment">#     </span>
+<a name="l00090"></a><a class="code" href="namespacevagueplaces.html#adec54b9e74dc2de30d17a2fe161f137c">00090</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#adec54b9e74dc2de30d17a2fe161f137c" title="Retrieve an europe country list from DBpedia with URIs.">european_countries</a>():
+<a name="l00091"></a>00091     sparql.setReturnFormat(JSON)
+<a name="l00092"></a>00092     
+<a name="l00093"></a>00093     sparql.setQuery(<span class="stringliteral">&quot;&quot;&quot;</span>
+<a name="l00094"></a>00094 <span class="stringliteral">                    PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
+<a name="l00095"></a>00095 <span class="stringliteral">                    PREFIX yago: &lt;http://dbpedia.org/class/yago/&gt;</span>
+<a name="l00096"></a>00096 <span class="stringliteral">                    PREFIX dbpedia-owl: &lt;http://dbpedia.org/ontology/&gt;</span>
+<a name="l00097"></a>00097 <span class="stringliteral">    </span>
+<a name="l00098"></a>00098 <span class="stringliteral">                    SELECT DISTINCT ?place WHERE {</span>
+<a name="l00099"></a>00099 <span class="stringliteral">                        ?place rdf:type yago:EuropeanCountries .</span>
+<a name="l00100"></a>00100 <span class="stringliteral">                        ?place rdf:type dbpedia-owl:Country</span>
+<a name="l00101"></a>00101 <span class="stringliteral">                    }</span>
+<a name="l00102"></a>00102 <span class="stringliteral">                    &quot;&quot;&quot;</span>
+<a name="l00103"></a>00103     )
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105     results = sparql.query().convert()
+<a name="l00106"></a>00106     <span class="keywordflow">return</span> results[<span class="stringliteral">&quot;results&quot;</span>][<span class="stringliteral">&quot;bindings&quot;</span>]
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108 <span class="comment">##</span>
+<a name="l00109"></a>00109 <span class="comment"># </span>
+<a name="l00110"></a>00110 <span class="comment">#         Retrieve a list of points from DBpedia matching the input.</span>
+<a name="l00111"></a>00111 <span class="comment">#         \param country_uri country to query</span>
+<a name="l00112"></a>00112 <span class="comment">#         \param query_list substring to check in the Abstract</span>
+<a name="l00113"></a>00113 <span class="comment">#         \param offset Offset to start retrieving</span>
+<a name="l00114"></a>00114 <span class="comment">#         \param limit Limit of lines to retrieve</span>
+<a name="l00115"></a>00115 <span class="comment">#         \return List with points with title,geolat,geolong</span>
+<a name="l00116"></a>00116 <span class="comment">#     </span>
+<a name="l00117"></a><a class="code" href="namespacevagueplaces.html#aed235c5c580e7ab436215ad07be55b27">00117</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#aed235c5c580e7ab436215ad07be55b27" title="Retrieve a list of points from DBpedia matching the input.">get_points</a>(country_uri,query_list,offset,limit):
+<a name="l00118"></a>00118     regex_list = []
+<a name="l00119"></a>00119     <span class="keywordflow">for</span> q <span class="keywordflow">in</span> query_list:
+<a name="l00120"></a>00120         regex_list.append(<span class="stringliteral">&quot;&quot;&quot;regex(?abstract,\&quot; &quot;&quot;&quot;</span>+str(q)+<span class="stringliteral">&quot;&quot;&quot;\&quot;,&quot;i&quot;) &quot;&quot;&quot;</span>)
+<a name="l00121"></a>00121 
+<a name="l00122"></a>00122     query = <span class="stringliteral">&quot;||&quot;</span>.join(regex_list)
+<a name="l00123"></a>00123 
+<a name="l00124"></a>00124     querystr = <span class="stringliteral">&quot;&quot;&quot;</span>
+<a name="l00125"></a>00125 <span class="stringliteral">        SELECT DISTINCT ?title,?geolat,?geolong</span>
+<a name="l00126"></a>00126 <span class="stringliteral">        WHERE{</span>
+<a name="l00127"></a>00127 <span class="stringliteral">          ?place rdf:type dbpedia-owl:Place .</span>
+<a name="l00128"></a>00128 <span class="stringliteral">          ?place dbpedia-owl:country &lt;&quot;&quot;&quot;</span> + country_uri + <span class="stringliteral">&quot;&quot;&quot;&gt; .</span>
+<a name="l00129"></a>00129 <span class="stringliteral">          ?place foaf:name ?title .</span>
+<a name="l00130"></a>00130 <span class="stringliteral">          ?place geo:lat ?geolat .</span>
+<a name="l00131"></a>00131 <span class="stringliteral">          ?place geo:long ?geolong .</span>
+<a name="l00132"></a>00132 <span class="stringliteral">          ?place dbpedia-owl:abstract ?abstract .</span>
+<a name="l00133"></a>00133 <span class="stringliteral">          FILTER (&quot;&quot;&quot;</span>+ query +<span class="stringliteral">&quot;&quot;&quot;)</span>
+<a name="l00134"></a>00134 <span class="stringliteral">        }</span>
+<a name="l00135"></a>00135 <span class="stringliteral">        OFFSET &quot;&quot;&quot;</span> + str(offset) + <span class="stringliteral">&quot;&quot;&quot;</span>
+<a name="l00136"></a>00136 <span class="stringliteral">        LIMIT &quot;&quot;&quot;</span> + str(limit)+ <span class="stringliteral">&quot;&quot;&quot;</span>
+<a name="l00137"></a>00137 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00138"></a>00138 
+<a name="l00139"></a>00139     sparql.setQuery(querystr)
+<a name="l00140"></a>00140     
+<a name="l00141"></a>00141     country_results = sparql.query().convert()
+<a name="l00142"></a>00142     <span class="keywordflow">return</span> country_results[<span class="stringliteral">&quot;results&quot;</span>][<span class="stringliteral">&quot;bindings&quot;</span>]
+<a name="l00143"></a>00143          
+<a name="l00144"></a>00144 <span class="comment">##</span>
+<a name="l00145"></a>00145 <span class="comment"># </span>
+<a name="l00146"></a>00146 <span class="comment">#          \todo gen_heatmap is not implemented</span>
+<a name="l00147"></a>00147 <span class="comment">#     </span>
+<a name="l00148"></a><a class="code" href="namespacevagueplaces.html#a085e07955df048db8ed1621669a4a064">00148</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a085e07955df048db8ed1621669a4a064">gen_heatmap</a>():
+<a name="l00149"></a>00149     <span class="keywordflow">pass</span>
+<a name="l00150"></a>00150 
+<a name="l00151"></a>00151 <span class="comment">##</span>
+<a name="l00152"></a>00152 <span class="comment"># </span>
+<a name="l00153"></a>00153 <span class="comment">#         Generate the convex hull for the report</span>
+<a name="l00154"></a>00154 <span class="comment">#     </span>
+<a name="l00155"></a><a class="code" href="namespacevagueplaces.html#abace2d9a58e6249fea81bb4163cd9ef6">00155</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#abace2d9a58e6249fea81bb4163cd9ef6" title="Generate the convex hull for the report.">gen_convex_hull</a>():
+<a name="l00156"></a>00156     plist = []
+<a name="l00157"></a>00157     
+<a name="l00158"></a>00158     <span class="keywordflow">for</span> p <span class="keywordflow">in</span> PLACES:
+<a name="l00159"></a>00159         plist.append((float(p.lon),float(p.lat)))
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161     REPORT.set_wkt_chull(GEOM.convex_hull(plist))
+<a name="l00162"></a>00162 
+<a name="l00163"></a>00163 <span class="comment">##</span>
+<a name="l00164"></a>00164 <span class="comment"># </span>
+<a name="l00165"></a>00165 <span class="comment">#         External system execution of alpha_shaper to generate a WKT alpha shape file.</span>
+<a name="l00166"></a>00166 <span class="comment">#         Expects a CGAL file with lon lat corrdinates and the first line an integer</span>
+<a name="l00167"></a>00167 <span class="comment">#         of the total number of lines to read</span>
+<a name="l00168"></a>00168 <span class="comment">#     </span>
+<a name="l00169"></a><a class="code" href="namespacevagueplaces.html#a97ab699f1b7ffdaf4b86a2342cc1bdc3">00169</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a97ab699f1b7ffdaf4b86a2342cc1bdc3" title="External system execution of alpha_shaper to generate a WKT alpha shape file.">gen_alpha_shape</a>(cgalfile,alpha):
+<a name="l00170"></a>00170     opt_alpha,wkt_polygons = GEOM.alpha_shape(cgalfile,alpha);
+<a name="l00171"></a>00171     REPORT.set_alphas(alpha,opt_alpha)
+<a name="l00172"></a>00172     REPORT.set_wkt_ashape(wkt_polygons)
+<a name="l00173"></a>00173 
+<a name="l00174"></a><a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">00174</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">finish_program</a>():
+<a name="l00175"></a>00175     OF.close()
+<a name="l00176"></a>00176     S.stop()
+<a name="l00177"></a>00177     sys.exit(0)
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179 <span class="comment">##</span>
+<a name="l00180"></a>00180 <span class="comment">#  </span>
+<a name="l00181"></a>00181 <span class="comment">#         Writes a file to be read by cgal alpha_shape generator </span>
+<a name="l00182"></a>00182 <span class="comment">#     </span>
+<a name="l00183"></a><a class="code" href="namespacevagueplaces.html#a31c6bc6970f61bd314e35668a15bfa6f">00183</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a31c6bc6970f61bd314e35668a15bfa6f" title="Writes a file to be read by cgal alpha_shape generator.">write_file_cgal</a>(fileh):
+<a name="l00184"></a>00184     fileh.write(str(len(PLACES))+<span class="stringliteral">&quot;\n&quot;</span>)
+<a name="l00185"></a>00185     <span class="keywordflow">for</span> p <span class="keywordflow">in</span> PLACES:
+<a name="l00186"></a>00186         fileh.write(p.lon+<span class="stringliteral">&quot; &quot;</span>+p.lat+<span class="stringliteral">&quot;\n&quot;</span>)
+<a name="l00187"></a>00187 
+<a name="l00188"></a>00188 <span class="comment">##</span>
+<a name="l00189"></a>00189 <span class="comment">#  </span>
+<a name="l00190"></a>00190 <span class="comment">#         Writes a CSV file to be opened by a GIS software. WKT </span>
+<a name="l00191"></a>00191 <span class="comment">#     </span>
+<a name="l00192"></a><a class="code" href="namespacevagueplaces.html#a82d499b2844c4caf6e3d29e242edd1d8">00192</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#a82d499b2844c4caf6e3d29e242edd1d8" title="Writes a CSV file to be opened by a GIS software.">write_file_csv</a>(fileh):
+<a name="l00193"></a>00193     header = <span class="stringliteral">&quot;name;WKT;Country;Abstract\n&quot;</span>
+<a name="l00194"></a>00194     fileh.write(header)
+<a name="l00195"></a>00195 
+<a name="l00196"></a>00196     <span class="keywordflow">for</span> p <span class="keywordflow">in</span> PLACES:
+<a name="l00197"></a>00197         fileh.write(p.name+<span class="stringliteral">&quot;; POINT(&quot;</span>+p.lon+<span class="stringliteral">&quot; &quot;</span>+p.lat+<span class="stringliteral">&quot;);&quot;</span>+p.country+<span class="stringliteral">&quot;;&quot;</span>+p.text+<span class="stringliteral">&quot;\n&quot;</span>)
+<a name="l00198"></a>00198 
+<a name="l00199"></a>00199 <span class="comment">##</span>
+<a name="l00200"></a>00200 <span class="comment">#  </span>
+<a name="l00201"></a>00201 <span class="comment">#         Write a file (fileh) with the format (wf). Accepting csv and cgal</span>
+<a name="l00202"></a>00202 <span class="comment">#     </span>
+<a name="l00203"></a><a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964">00203</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964" title="Write a file (fileh) with the format (wf).">write_file</a>(fileh,wf):
+<a name="l00204"></a>00204     <span class="keywordflow">if</span> wf.lower() == <span class="stringliteral">&#39;cgal&#39;</span>:
+<a name="l00205"></a>00205         <a class="code" href="namespacevagueplaces.html#a31c6bc6970f61bd314e35668a15bfa6f" title="Writes a file to be read by cgal alpha_shape generator.">write_file_cgal</a>(fileh)
+<a name="l00206"></a>00206     <span class="keywordflow">elif</span> wf.lower() == <span class="stringliteral">&#39;csv&#39;</span>:
+<a name="l00207"></a>00207         <a class="code" href="namespacevagueplaces.html#a82d499b2844c4caf6e3d29e242edd1d8" title="Writes a CSV file to be opened by a GIS software.">write_file_csv</a>(fileh)
+<a name="l00208"></a>00208     fileh.close()
+<a name="l00209"></a>00209 
+<a name="l00210"></a>00210 
 <a name="l00211"></a>00211 <span class="comment"># ###########################</span>
-<a name="l00212"></a><a class="code" href="namespacevagueplaces.html#ae8bd8113632ad176c928b0b2871460c4">00212</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#ae8bd8113632ad176c928b0b2871460c4">kill_handler</a>(signal, frame):
-<a name="l00213"></a>00213     <span class="keywordflow">print</span> <span class="stringliteral">&#39;Kill Signal Recieved&#39;</span>
-<a name="l00214"></a>00214     <a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">finish_program</a>()
-<a name="l00215"></a>00215 
-<a name="l00216"></a>00216 signal.signal(signal.SIGINT, kill_handler)
-<a name="l00217"></a>00217 
-<a name="l00218"></a>00218 <span class="comment"># ###########################</span>
-<a name="l00219"></a>00219 <span class="comment">#</span>
-<a name="l00220"></a>00220 <span class="comment">#  START</span>
-<a name="l00221"></a>00221 <span class="comment">#</span>
+<a name="l00212"></a>00212 <span class="comment">#</span>
+<a name="l00213"></a>00213 <span class="comment">#  SIGNAL HANDLING</span>
+<a name="l00214"></a>00214 <span class="comment">#</span>
+<a name="l00215"></a>00215 <span class="comment"># ###########################</span>
+<a name="l00216"></a><a class="code" href="namespacevagueplaces.html#ae8bd8113632ad176c928b0b2871460c4">00216</a> <span class="keyword">def </span><a class="code" href="namespacevagueplaces.html#ae8bd8113632ad176c928b0b2871460c4">kill_handler</a>(signal, frame):
+<a name="l00217"></a>00217     <span class="keywordflow">print</span> <span class="stringliteral">&#39;Kill Signal Recieved&#39;</span>
+<a name="l00218"></a>00218     <a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">finish_program</a>()
+<a name="l00219"></a>00219 
+<a name="l00220"></a>00220 signal.signal(signal.SIGINT, kill_handler)
+<a name="l00221"></a>00221 
 <a name="l00222"></a>00222 <span class="comment"># ###########################</span>
-<a name="l00223"></a>00223 <span class="keywordflow">for</span> country <span class="keywordflow">in</span> <a class="code" href="namespacevagueplaces.html#adec54b9e74dc2de30d17a2fe161f137c" title="Retrieve an europe country list from DBpedia with URIs.">european_countries</a>():
-<a name="l00224"></a><a class="code" href="namespacevagueplaces.html#aed19f140324bfa70b0d22d5078ed1a33">00224</a>     country_uri = country[<span class="stringliteral">&quot;place&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>]
-<a name="l00225"></a><a class="code" href="namespacevagueplaces.html#a439323fd94d6776127c4d46f50242309">00225</a>     country_name = country_uri.rpartition(<span class="stringliteral">&#39;/&#39;</span>)[-1]
-<a name="l00226"></a><a class="code" href="namespacevagueplaces.html#aa2411570d3d42e5c2daf01af8c980b20">00226</a>     total_results = 0
-<a name="l00227"></a><a class="code" href="namespacevagueplaces.html#aedee1b25605e448202ade844e392b896">00227</a>     offset = 0
-<a name="l00228"></a><a class="code" href="namespacevagueplaces.html#a22c8a6a4861b99a18d096217c04a39af">00228</a>     query_results = 1
-<a name="l00229"></a>00229     
-<a name="l00230"></a>00230     S.set_msg(country_name)
-<a name="l00231"></a>00231 
-<a name="l00232"></a>00232     <span class="keywordflow">while</span> query_results &gt; 0:
-<a name="l00233"></a>00233         <span class="keywordflow">try</span>:
-<a name="l00234"></a><a class="code" href="namespacevagueplaces.html#a05416e0b132e478c479ed1fba77ad4a8">00234</a>             country_results = <a class="code" href="namespacevagueplaces.html#aed235c5c580e7ab436215ad07be55b27" title="Retrieve a list of points from DBpedia matching the input.">get_points</a>(country_uri,query_list,offset,RESULTS_QUERY)
-<a name="l00235"></a>00235             
-<a name="l00236"></a>00236             <span class="keywordflow">for</span> result <span class="keywordflow">in</span> country_results:
-<a name="l00237"></a><a class="code" href="namespacevagueplaces.html#a967dc293801b4684884a9841274c9591">00237</a>                 title = result[<span class="stringliteral">&quot;title&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>].encode(<span class="stringliteral">&#39;ascii&#39;</span>,<span class="stringliteral">&#39;ignore&#39;</span>)
-<a name="l00238"></a><a class="code" href="namespacevagueplaces.html#affe00f0ec5293de098491e2ee7a27bbf">00238</a>                 lat = result [<span class="stringliteral">&quot;geolat&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>]
-<a name="l00239"></a><a class="code" href="namespacevagueplaces.html#a95b2086442c1258ddf336e75265f6885">00239</a>                 lon = result[<span class="stringliteral">&quot;geolong&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>]
-<a name="l00240"></a><a class="code" href="namespacevagueplaces.html#a0bc0e84c0011cb9531184b67d05dc0a4">00240</a>                 country = country_name
-<a name="l00241"></a>00241                 <span class="comment">#abstract = result[&quot;abstract&quot;][&quot;value&quot;].encode(&#39;ascii&#39;,&#39;ignore&#39;)</span>
-<a name="l00242"></a><a class="code" href="namespacevagueplaces.html#af80846e508540f2e094cdcfd30da1eeb">00242</a>                 abstract = <span class="stringliteral">&quot;&quot;</span>
-<a name="l00243"></a>00243                 if(lat!=<span class="stringliteral">&#39;NAN&#39;</span> <span class="keywordflow">and</span> lon != <span class="stringliteral">&#39;NAN&#39;</span>):
-<a name="l00244"></a>00244                     PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
-<a name="l00245"></a>00245 
-<a name="l00246"></a>00246             query_results = len(country_results)
-<a name="l00247"></a>00247             offset = offset + query_results
-<a name="l00248"></a>00248             total_results += query_results
-<a name="l00249"></a>00249         <span class="keywordflow">except</span> Exception <span class="keyword">as</span> inst:
-<a name="l00250"></a>00250             <span class="keywordflow">print</span> type(inst)
-<a name="l00251"></a>00251             <span class="keywordflow">print</span> <span class="stringliteral">&quot;EXCEPTION&quot;</span>
-<a name="l00252"></a>00252 
-<a name="l00253"></a>00253     
-<a name="l00254"></a>00254     <span class="keywordflow">if</span> isdebug: 
-<a name="l00255"></a>00255         sys.stdout.write(<span class="stringliteral">&quot;\r\x1b[K&quot;</span>+country_uri+<span class="stringliteral">&quot; &quot;</span>+str(total_results)+<span class="stringliteral">&quot;\n&quot;</span>)
-<a name="l00256"></a>00256         sys.stdout.flush()
-<a name="l00257"></a>00257 
-<a name="l00258"></a>00258 REPORT.set_country_count(PLACES);
-<a name="l00259"></a>00259 
-<a name="l00260"></a>00260 <span class="keywordflow">if</span> (len(PLACES) &gt; 0):
-<a name="l00261"></a>00261     <span class="comment"># ###########################</span>
-<a name="l00262"></a>00262     <span class="comment">#</span>
-<a name="l00263"></a>00263     <span class="comment">#  POLYGON GENERATION</span>
-<a name="l00264"></a>00264     <span class="comment">#</span>
+<a name="l00223"></a>00223 <span class="comment">#</span>
+<a name="l00224"></a>00224 <span class="comment">#  START</span>
+<a name="l00225"></a>00225 <span class="comment">#</span>
+<a name="l00226"></a>00226 <span class="comment"># ###########################</span>
+<a name="l00227"></a>00227 <span class="keywordflow">for</span> country <span class="keywordflow">in</span> <a class="code" href="namespacevagueplaces.html#adec54b9e74dc2de30d17a2fe161f137c" title="Retrieve an europe country list from DBpedia with URIs.">european_countries</a>():
+<a name="l00228"></a><a class="code" href="namespacevagueplaces.html#aed19f140324bfa70b0d22d5078ed1a33">00228</a>     country_uri = country[<span class="stringliteral">&quot;place&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>]
+<a name="l00229"></a><a class="code" href="namespacevagueplaces.html#a439323fd94d6776127c4d46f50242309">00229</a>     country_name = country_uri.rpartition(<span class="stringliteral">&#39;/&#39;</span>)[-1]
+<a name="l00230"></a><a class="code" href="namespacevagueplaces.html#aa2411570d3d42e5c2daf01af8c980b20">00230</a>     total_results = 0
+<a name="l00231"></a><a class="code" href="namespacevagueplaces.html#aedee1b25605e448202ade844e392b896">00231</a>     offset = 0
+<a name="l00232"></a><a class="code" href="namespacevagueplaces.html#a22c8a6a4861b99a18d096217c04a39af">00232</a>     query_results = 1
+<a name="l00233"></a>00233     
+<a name="l00234"></a>00234     S.set_msg(country_name)
+<a name="l00235"></a>00235 
+<a name="l00236"></a>00236     <span class="keywordflow">while</span> query_results &gt; 0:
+<a name="l00237"></a>00237         <span class="keywordflow">try</span>:
+<a name="l00238"></a><a class="code" href="namespacevagueplaces.html#a05416e0b132e478c479ed1fba77ad4a8">00238</a>             country_results = <a class="code" href="namespacevagueplaces.html#aed235c5c580e7ab436215ad07be55b27" title="Retrieve a list of points from DBpedia matching the input.">get_points</a>(country_uri,query_list,offset,RESULTS_QUERY)
+<a name="l00239"></a>00239             
+<a name="l00240"></a>00240             <span class="keywordflow">for</span> result <span class="keywordflow">in</span> country_results:
+<a name="l00241"></a><a class="code" href="namespacevagueplaces.html#a967dc293801b4684884a9841274c9591">00241</a>                 title = result[<span class="stringliteral">&quot;title&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>].encode(<span class="stringliteral">&#39;ascii&#39;</span>,<span class="stringliteral">&#39;ignore&#39;</span>)
+<a name="l00242"></a><a class="code" href="namespacevagueplaces.html#affe00f0ec5293de098491e2ee7a27bbf">00242</a>                 lat = result [<span class="stringliteral">&quot;geolat&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>]
+<a name="l00243"></a><a class="code" href="namespacevagueplaces.html#a95b2086442c1258ddf336e75265f6885">00243</a>                 lon = result[<span class="stringliteral">&quot;geolong&quot;</span>][<span class="stringliteral">&quot;value&quot;</span>]
+<a name="l00244"></a><a class="code" href="namespacevagueplaces.html#a0bc0e84c0011cb9531184b67d05dc0a4">00244</a>                 country = country_name
+<a name="l00245"></a>00245                 <span class="comment">#abstract = result[&quot;abstract&quot;][&quot;value&quot;].encode(&#39;ascii&#39;,&#39;ignore&#39;)</span>
+<a name="l00246"></a><a class="code" href="namespacevagueplaces.html#af80846e508540f2e094cdcfd30da1eeb">00246</a>                 abstract = <span class="stringliteral">&quot;&quot;</span>
+<a name="l00247"></a>00247                 if(lat!=<span class="stringliteral">&#39;NAN&#39;</span> <span class="keywordflow">and</span> lon != <span class="stringliteral">&#39;NAN&#39;</span>):
+<a name="l00248"></a>00248                     PLACES.append(cPlace.cPlace(title,lat,lon,abstract,country))
+<a name="l00249"></a>00249 
+<a name="l00250"></a>00250             query_results = len(country_results)
+<a name="l00251"></a>00251             offset = offset + query_results
+<a name="l00252"></a>00252             total_results += query_results
+<a name="l00253"></a>00253         <span class="keywordflow">except</span> Exception <span class="keyword">as</span> inst:
+<a name="l00254"></a>00254             <span class="keywordflow">print</span> type(inst)
+<a name="l00255"></a>00255             <span class="keywordflow">print</span> <span class="stringliteral">&quot;EXCEPTION&quot;</span>
+<a name="l00256"></a>00256 
+<a name="l00257"></a>00257     
+<a name="l00258"></a>00258     <span class="keywordflow">if</span> isdebug: 
+<a name="l00259"></a>00259         sys.stdout.write(<span class="stringliteral">&quot;\r\x1b[K&quot;</span>+country_uri+<span class="stringliteral">&quot; &quot;</span>+str(total_results)+<span class="stringliteral">&quot;\n&quot;</span>)
+<a name="l00260"></a>00260         sys.stdout.flush()
+<a name="l00261"></a>00261 
+<a name="l00262"></a>00262 REPORT.set_country_count(PLACES);
+<a name="l00263"></a>00263 
+<a name="l00264"></a>00264 <span class="keywordflow">if</span> (len(PLACES) &gt; 0):
 <a name="l00265"></a>00265     <span class="comment"># ###########################</span>
-<a name="l00266"></a><a class="code" href="namespacevagueplaces.html#a3b9ac6b99db27960b0431390dcd551cd">00266</a>     tmpfile = tempfile.NamedTemporaryFile(prefix=<span class="stringliteral">&#39;vagueplace&#39;</span>,delete=<span class="keyword">False</span>);
-<a name="l00267"></a>00267     <a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964" title="Write a file (fileh) with the format (wf).">write_file</a>(tmpfile,<span class="stringliteral">&#39;cgal&#39;</span>)
-<a name="l00268"></a>00268     
-<a name="l00269"></a>00269     <a class="code" href="namespacevagueplaces.html#a97ab699f1b7ffdaf4b86a2342cc1bdc3" title="External system execution of alpha_shaper to generate a WKT alpha shape file.">gen_alpha_shape</a>(tmpfile,alpha);
-<a name="l00270"></a>00270     <a class="code" href="namespacevagueplaces.html#abace2d9a58e6249fea81bb4163cd9ef6" title="Generate the convex hull for the report.">gen_convex_hull</a>();
-<a name="l00271"></a>00271     
-<a name="l00272"></a>00272     <span class="comment"># ###########################</span>
-<a name="l00273"></a>00273     <span class="comment">#</span>
-<a name="l00274"></a>00274     <span class="comment">#  REPORT PRINTING</span>
-<a name="l00275"></a>00275     <span class="comment">#</span>
+<a name="l00266"></a>00266     <span class="comment">#</span>
+<a name="l00267"></a>00267     <span class="comment">#  POLYGON GENERATION</span>
+<a name="l00268"></a>00268     <span class="comment">#</span>
+<a name="l00269"></a>00269     <span class="comment"># ###########################</span>
+<a name="l00270"></a><a class="code" href="namespacevagueplaces.html#a3b9ac6b99db27960b0431390dcd551cd">00270</a>     tmpfile = tempfile.NamedTemporaryFile(prefix=<span class="stringliteral">&#39;vagueplace&#39;</span>,delete=<span class="keyword">False</span>);
+<a name="l00271"></a>00271     <a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964" title="Write a file (fileh) with the format (wf).">write_file</a>(tmpfile,<span class="stringliteral">&#39;cgal&#39;</span>)
+<a name="l00272"></a>00272     
+<a name="l00273"></a>00273     <a class="code" href="namespacevagueplaces.html#a97ab699f1b7ffdaf4b86a2342cc1bdc3" title="External system execution of alpha_shaper to generate a WKT alpha shape file.">gen_alpha_shape</a>(tmpfile,alpha);
+<a name="l00274"></a>00274     <a class="code" href="namespacevagueplaces.html#abace2d9a58e6249fea81bb4163cd9ef6" title="Generate the convex hull for the report.">gen_convex_hull</a>();
+<a name="l00275"></a>00275     
 <a name="l00276"></a>00276     <span class="comment"># ###########################</span>
-<a name="l00277"></a>00277     REPORT.print_report();
-<a name="l00278"></a>00278     
-<a name="l00279"></a>00279     
+<a name="l00277"></a>00277     <span class="comment">#</span>
+<a name="l00278"></a>00278     <span class="comment">#  REPORT PRINTING</span>
+<a name="l00279"></a>00279     <span class="comment">#</span>
 <a name="l00280"></a>00280     <span class="comment"># ###########################</span>
-<a name="l00281"></a>00281     <span class="comment">#</span>
-<a name="l00282"></a>00282     <span class="comment">#  FILE WRITING</span>
-<a name="l00283"></a>00283     <span class="comment">#</span>
+<a name="l00281"></a>00281     REPORT.print_report();
+<a name="l00282"></a>00282     
+<a name="l00283"></a>00283     
 <a name="l00284"></a>00284     <span class="comment"># ###########################</span>
-<a name="l00285"></a>00285     S.pause();
-<a name="l00286"></a>00286     <a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964" title="Write a file (fileh) with the format (wf).">write_file</a>(OF,<span class="stringliteral">&#39;csv&#39;</span>)
-<a name="l00287"></a>00287     
+<a name="l00285"></a>00285     <span class="comment">#</span>
+<a name="l00286"></a>00286     <span class="comment">#  FILE WRITING</span>
+<a name="l00287"></a>00287     <span class="comment">#</span>
 <a name="l00288"></a>00288     <span class="comment"># ###########################</span>
-<a name="l00289"></a>00289     <span class="comment">#</span>
-<a name="l00290"></a>00290     <span class="comment">#  CLOSURE</span>
-<a name="l00291"></a>00291     <span class="comment">#</span>
+<a name="l00289"></a>00289     S.pause();
+<a name="l00290"></a>00290     <a class="code" href="namespacevagueplaces.html#aaebf90c401271b3c8426734be3676964" title="Write a file (fileh) with the format (wf).">write_file</a>(OF,<span class="stringliteral">&#39;csv&#39;</span>)
+<a name="l00291"></a>00291     
 <a name="l00292"></a>00292     <span class="comment"># ###########################</span>
-<a name="l00293"></a>00293 <span class="keywordflow">else</span>:
-<a name="l00294"></a>00294     <span class="keywordflow">print</span> <span class="stringliteral">&quot;No results for this query&quot;</span>
-<a name="l00295"></a>00295 
-<a name="l00296"></a>00296 <a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">finish_program</a>()
-<a name="l00297"></a>00297 
+<a name="l00293"></a>00293     <span class="comment">#</span>
+<a name="l00294"></a>00294     <span class="comment">#  CLOSURE</span>
+<a name="l00295"></a>00295     <span class="comment">#</span>
+<a name="l00296"></a>00296     <span class="comment"># ###########################</span>
+<a name="l00297"></a>00297 <span class="keywordflow">else</span>:
+<a name="l00298"></a>00298     <span class="keywordflow">print</span> <span class="stringliteral">&quot;No results for this query&quot;</span>
+<a name="l00299"></a>00299 
+<a name="l00300"></a>00300 <a class="code" href="namespacevagueplaces.html#a8384e83cc2817ccd5697611b911be2e5">finish_program</a>()
+<a name="l00301"></a>00301 
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -396,7 +401,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 8 2012 18:01:14 for Vague Places Generator by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 27 2012 14:14:13 for Vague Places Generator by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
