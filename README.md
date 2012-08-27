@@ -7,3 +7,4 @@ Jordi Castells
 
 This software is implemented as a Final project of a Geoinformatics Master course at ITC Faculty of Geo-Information Science and Earth Observation.
 
+The main file is vagueplaces.py
