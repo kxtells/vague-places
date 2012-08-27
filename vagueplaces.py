@@ -103,7 +103,7 @@ def get_points(country_uri,query_list,offset,limit):
     """
         Retrieve a list of points from DBpedia matching the input.
         \param country_uri country to query
-        \param query substring to check in the Abstract
+        \param query_list substring to check in the Abstract
         \param offset Offset to start retrieving
         \param limit Limit of lines to retrieve
         \return List with points with title,geolat,geolong
