@@ -3,11 +3,13 @@ import argparse
 import sys
 import threading
 import time
-import signal 
+import signal
+import warnings
+import xml
 
 ############################
 #
-#  ARGUMENT PARSING 
+#  ARGUMENT PARSING
 #
 ############################
 
@@ -78,7 +80,7 @@ class cSpinner(threading.Thread):
 ############################
 OF = arguments.fileout
 islive = arguments.live_bool
-RESULTS_QUERY = 20000 
+RESULTS_QUERY = 20000
 
 if islive:
     sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
@@ -102,7 +104,7 @@ def finish_program():
 
 def wait_to_continue():
     S.pause()
-    
+
     waiter = cSpinner()
     waiter.set_char_array(["Waiting.","Waiting..","Waiting..."])
     waiter.start()
@@ -119,7 +121,7 @@ def get_total_dbpedia_points(islive):
             sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
         else:
             sparql = SPARQLWrapper("http://dbpedia.org/sparql")
-        
+
         sparql.setReturnFormat(JSON)
 
         sparql.setQuery("""
@@ -133,6 +135,9 @@ def get_total_dbpedia_points(islive):
                 """)
 
         results_array = sparql.query().convert()
+
+        if isinstance(results_array, xml.dom.minidom.Document):
+            warnings.warn("Expecting JSON, XML returned")
 
         total = results_array["results"]["bindings"][0]["count"]["value"]
         return total
@@ -166,7 +171,7 @@ S.start()
 header = "name;WKT\n"
 OF.write(header)
 
-total_results = 0 
+total_results = 0
 query_results = 1
 offset = 0
 
@@ -187,7 +192,7 @@ while query_results > 0:
         results_array = sparql.query().convert()
         for result in results_array["results"]["bindings"]:
             OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n")
-   
+
         query_results = len(results_array["results"]["bindings"])
         offset = offset + query_results
         total_results += query_results

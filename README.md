@@ -15,6 +15,12 @@ Online gazetteers provide services that help to geocode locations. Given the nam
 
 Previous work presented a solution to the problem. The main aim of this small project is to provideanother way to obtain a similar or better solution with the aid of the semantic web formats using DBpediaas a base data repository
 
+Requirements
+============
+To run vagueplaces.py you will have to provide a couple of libraries:
+shapely
+SPARQLWrapper
+
 Official Report
 ===============
 The official report can be found in PDF format either in Scribd or Mendeley:
