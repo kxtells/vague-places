@@ -2,7 +2,7 @@
  Vagueplaces Generator
  \author Jordi Castells
  \date 10 August 2012
- \mainpage 
+ \mainpage
 
   This software is implemented as a Final project of a Geoinformatics Master course at ITC Faculty of Geo-Information Science and Earth Observation.
 
@@ -13,6 +13,7 @@ import sys
 import signal
 import os
 import tempfile
+import xml, warnings
 
 import cSpinner
 import cPlace
@@ -87,12 +88,12 @@ def european_countries():
         @return List with country URIS
     """
     sparql.setReturnFormat(JSON)
-    
+
     sparql.setQuery("""
                     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                     PREFIX yago: <http://dbpedia.org/class/yago/>
                     PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-    
+
                     SELECT DISTINCT ?place WHERE {
                         ?place rdf:type yago:EuropeanCountries .
                         ?place rdf:type dbpedia-owl:Country
@@ -101,6 +102,11 @@ def european_countries():
     )
 
     results = sparql.query().convert()
+
+    if isinstance(results, xml.dom.minidom.Document):
+        warnings.warn("Expecting JSON, XML returned")
+        finish_program()
+
     return results["results"]["bindings"]
 
 def get_points(country_uri,query_list,offset,limit):
@@ -134,10 +140,10 @@ def get_points(country_uri,query_list,offset,limit):
         """
 
     sparql.setQuery(querystr)
-    
+
     country_results = sparql.query().convert()
     return country_results["results"]["bindings"]
-         
+
 def gen_heatmap():
     """
          \todo gen_heatmap is not implemented
@@ -149,7 +155,7 @@ def gen_convex_hull():
         Generate the convex hull for the report
     """
     plist = []
-    
+
     for p in PLACES:
         plist.append((float(p.lon),float(p.lat)))
 
@@ -171,16 +177,16 @@ def finish_program():
     sys.exit(0)
 
 def write_file_cgal(fileh):
-    """ 
-        Writes a file to be read by cgal alpha_shape generator 
+    """
+        Writes a file to be read by cgal alpha_shape generator
     """
     fileh.write(str(len(PLACES))+"\n")
     for p in PLACES:
         fileh.write(p.lon+" "+p.lat+"\n")
 
 def write_file_csv(fileh):
-    """ 
-        Writes a CSV file to be opened by a GIS software. WKT 
+    """
+        Writes a CSV file to be opened by a GIS software. WKT
     """
     header = "name;WKT;Country;Abstract\n"
     fileh.write(header)
@@ -189,7 +195,7 @@ def write_file_csv(fileh):
         fileh.write(p.name+"; POINT("+p.lon+" "+p.lat+");"+p.country+";"+p.text+"\n")
 
 def write_file(fileh,wf):
-    """ 
+    """
         Write a file (fileh) with the format (wf). Accepting csv and cgal
     """
     if wf.lower() == 'cgal':
@@ -221,13 +227,13 @@ for country in european_countries():
     total_results = 0
     offset = 0
     query_results = 1
-    
+
     S.set_msg(country_name)
 
     while query_results > 0:
         try:
             country_results = get_points(country_uri,query_list,offset,RESULTS_QUERY)
-            
+
             for result in country_results:
                 title = result["title"]["value"].encode('ascii','ignore')
                 lat = result ["geolat"]["value"]
@@ -245,8 +251,8 @@ for country in european_countries():
             print type(inst)
             print "EXCEPTION"
 
-    
-    if isdebug: 
+
+    if isdebug:
         sys.stdout.write("\r\x1b[K"+country_uri+" "+str(total_results)+"\n")
         sys.stdout.flush()
 
@@ -260,18 +266,18 @@ if (len(PLACES) > 0):
     # ###########################
     tmpfile = tempfile.NamedTemporaryFile(prefix='vagueplace',delete=False);
     write_file(tmpfile,'cgal')
-    
+
     gen_alpha_shape(tmpfile,alpha);
     gen_convex_hull();
-    
+
     # ###########################
     #
     #  REPORT PRINTING
     #
     # ###########################
     REPORT.print_report();
-    
-    
+
+
     # ###########################
     #
     #  FILE WRITING
@@ -279,7 +285,7 @@ if (len(PLACES) > 0):
     # ###########################
     S.pause();
     write_file(OF,'csv')
-    
+
     # ###########################
     #
     #  CLOSURE
