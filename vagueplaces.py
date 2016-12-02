@@ -7,11 +7,12 @@
   This software is implemented as a Final project of a Geoinformatics Master course at ITC Faculty of Geo-Information Science and Earth Observation.
 
 """
+
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import argparse
-import sys
 import signal
 import os
+import sys
 import tempfile
 import xml, warnings
 
@@ -19,6 +20,7 @@ import cSpinner
 import cPlace
 import cReport
 import geom_functions as GEOM
+
 
 # ###########################
 #
@@ -32,6 +34,8 @@ parser.add_argument('--query', action='store', dest='stringval', default=None,na
                     help='List of keywords to filter from the Abstract results. Interpreted as Logical disjunction')
 
 parser.add_argument('--alpha',type=float,default=0.1,dest='floatval')
+
+parser.add_argument('--reportFile', default=None, dest='reportFile',help='Store report to a file instead that StdOut')
 
 parser.add_argument('CSV_POINT_OUTPUT', type=argparse.FileType('wb', 0),
                     help='Retrieved points file out as CSV.')
@@ -92,19 +96,19 @@ def european_countries():
     sparql.setQuery("""
                     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                     PREFIX yago: <http://dbpedia.org/class/yago/>
-                    PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+                    PREFIX dbo: <http://dbpedia.org/ontology/>
 
                     SELECT DISTINCT ?place WHERE {
                         ?place rdf:type yago:EuropeanCountries .
-                        ?place rdf:type dbpedia-owl:Country
+                        ?place rdf:type dbo:Country
                     }
                     """
     )
 
     results = sparql.query().convert()
 
-    if isinstance(results, xml.dom.minidom.Document):
-        warnings.warn("Expecting JSON, XML returned")
+    if not isinstance(results, dict):
+        warnings.warn("Parsing Failure. Not a dictionary")
         finish_program()
 
     return results["results"]["bindings"]
@@ -127,12 +131,12 @@ def get_points(country_uri,query_list,offset,limit):
     querystr = """
         SELECT DISTINCT ?title,?geolat,?geolong
         WHERE{
-          ?place rdf:type dbpedia-owl:Place .
-          ?place dbpedia-owl:country <""" + country_uri + """> .
+          ?place rdf:type dbo:Place .
+          ?place dbo:country <""" + country_uri + """> .
           ?place foaf:name ?title .
           ?place geo:lat ?geolat .
           ?place geo:long ?geolong .
-          ?place dbpedia-owl:abstract ?abstract .
+          ?place dbo:abstract ?abstract .
           FILTER ("""+ query +""")
         }
         OFFSET """ + str(offset) + """
@@ -275,7 +279,11 @@ if (len(PLACES) > 0):
     #  REPORT PRINTING
     #
     # ###########################
-    REPORT.print_report();
+    if arguments.reportFile:
+        if not REPORT.write_report(arguments.reportFile):
+            print "Failure writing report file %s"% arguments.reportFile
+    else:
+        REPORT.print_report();
 
 
     # ###########################
@@ -291,6 +299,7 @@ if (len(PLACES) > 0):
     #  CLOSURE
     #
     # ###########################
+    print
 else:
     print "No results for this query"
 
