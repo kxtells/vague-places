@@ -23,13 +23,15 @@ class cSpinner(threading.Thread):
             time.sleep(0.1)
             self.index +=1
 
+        self.__printing("")
+
     def set_msg(self,text):
         """
             \brief Set the extra message to print
             \param text String to print
         """
         self.msg = text;
-    
+
     def __printing(self,data):
         """
             \brief print the information to stdout
