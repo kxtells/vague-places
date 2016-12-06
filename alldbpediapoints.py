@@ -116,35 +116,28 @@ def wait_to_continue():
 def get_total_dbpedia_points(islive):
     """ Count the total number of dbpedia points """
 
-    try:
-        if islive:
-            sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
-        else:
-            sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    if islive:
+        sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
+    else:
+        sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 
-        sparql.setReturnFormat(JSON)
+    sparql.setReturnFormat(JSON)
 
-        sparql.setQuery("""
-                        SELECT (COUNT(*) AS ?count)
-                        WHERE{
-                          ?place rdf:type dbpedia-owl:Place .
-                          ?place foaf:name ?title .
-                          ?place geo:lat ?geolat .
-                          ?place geo:long ?geolong .
-                        }
-                """)
+    sparql.setQuery("""
+                    SELECT (COUNT(*) AS ?count)
+                    WHERE{
+                      ?place rdf:type dbo:Place .
+                      ?place foaf:name ?title .
+                      ?place geo:lat ?geolat .
+                      ?place geo:long ?geolong .
+                    }
+            """)
 
-        results_array = sparql.query().convert()
+    results_array = sparql.query().convert()
 
-        if isinstance(results_array, xml.dom.minidom.Document):
-            warnings.warn("Expecting JSON, XML returned")
+    total = results_array["results"]["bindings"][0]["count"]["value"]
 
-        total = results_array["results"]["bindings"][0]["count"]["value"]
-        return total
-
-    except:
-        print "\n Error on counting total number"
-        finish_program()
+    return total
 
 
 ############################
@@ -168,7 +161,7 @@ print "Counting total entries"
 S.set_total(get_total_dbpedia_points(islive));
 S.start()
 
-header = "name;WKT\n"
+header = "name;country;URL;WKT\n"
 OF.write(header)
 
 total_results = 0
@@ -178,12 +171,14 @@ offset = 0
 while query_results > 0:
     try:
         sparql.setQuery("""
-            SELECT ?title,?geolat,?geolong
+            SELECT ?title,?geolat,?geolong, ?country, ?wikiurl
             WHERE{
-              ?place rdf:type dbpedia-owl:Place .
+              ?place rdf:type dbo:Place .
               ?place foaf:name ?title .
               ?place geo:lat ?geolat .
               ?place geo:long ?geolong .
+              ?place prov:wasDerivedFrom ?wikiurl .
+              ?place dbo:country ?country .
             }
             OFFSET """ + str(offset) + """
             LIMIT """ + str(RESULTS_QUERY)+ """
@@ -191,7 +186,11 @@ while query_results > 0:
 
         results_array = sparql.query().convert()
         for result in results_array["results"]["bindings"]:
-            OF.write(result["title"]["value"].encode("utf-8") + ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n")
+            OF.write(result["title"]["value"].encode("utf-8") +
+                    result["country"]["value"].encode("utf-8") +
+                    result["wikiurl"]["value"].encode("utf-8") +
+                    ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n"
+                    )
 
         query_results = len(results_array["results"]["bindings"])
         offset = offset + query_results
