@@ -28,7 +28,7 @@ import geom_functions as GEOM
 #
 # ###########################
 
-parser = argparse.ArgumentParser(description='CSV generation with name;point;country querying dbpedia')
+parser = argparse.ArgumentParser(description='Retrieve dbpedia points and generate their alpha shape')
 
 parser.add_argument('--query', action='store', dest='stringval', default=None,nargs='+',
                     help='List of keywords to filter from the Abstract results. Interpreted as Logical disjunction')
