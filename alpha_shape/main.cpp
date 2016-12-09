@@ -169,7 +169,7 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
   bool found = false;
   int pid = 0; //polygon id (possible alpha shape with different polygons)
   int count = 0;
-  std::vector<Segment> osegments [255]; //initialize at 255. not more
+  std::vector<Segment> osegments [10000]; //initialize at 255. not more
   std::vector<Segment> segments_tmp;
 
   for(int i = 0; i < segments.size();i++){
@@ -205,7 +205,7 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
     }
   }
   
-  for(int i=0;i<255;i++){
+  for(int i=0;i<10000;i++){
     if(osegments[i].size()==0) break;
     Polygon_2 P;
     std::vector<Segment>::iterator it = osegments[i].begin();
@@ -215,7 +215,9 @@ void segments_to_polygons(std::vector<Segment> segments, std::vector< Polygon_2 
       P.push_back(it->target());
     }
     P.push_back(P[0]);
-    polygons.push_back(P);
+    if (P.size() > 3){
+        polygons.push_back(P);
+    }
   }
 }
 
