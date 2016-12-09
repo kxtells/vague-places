@@ -6,6 +6,7 @@ import time
 import signal
 import warnings
 import xml
+import codecs
 
 ############################
 #
@@ -15,7 +16,8 @@ import xml
 
 parser = argparse.ArgumentParser(description='CSV generation with name;point;country querying dbpedia')
 
-parser.add_argument('--output', type=argparse.FileType('wb', 0), dest='fileout', default='dbpedia.csv',
+#parser.add_argument('--output', type=argparse.FileType('w', 'utf-8'), dest='fileout', default='dbpedia.csv',
+parser.add_argument('--output', dest='fileout', default='dbpedia.csv',
                     help='File out. [default dbpedia.csv]')
 
 parser.add_argument('--live', action='store_true',default=False,
@@ -78,9 +80,9 @@ class cSpinner(threading.Thread):
 #  INITIALIZATIONS
 #
 ############################
-OF = arguments.fileout
+OF = codecs.open(arguments.fileout, 'wb', 'utf-8')
 islive = arguments.live_bool
-RESULTS_QUERY = 20000
+RESULTS_QUERY = 10000
 
 if islive:
     sparql = SPARQLWrapper("http://live.dbpedia.org/sparql")
@@ -98,8 +100,8 @@ S = cSpinner()
 #
 ############################
 def finish_program():
-    OF.close()
     S.stop()
+    OF.close()
     sys.exit(0)
 
 def wait_to_continue():
@@ -168,47 +170,63 @@ total_results = 0
 query_results = 1
 offset = 0
 
-while query_results > 0:
-    try:
-        sparql.setQuery("""
-            SELECT ?title,?geolat,?geolong, ?country, ?wikiurl
-            WHERE{
-              ?place rdf:type dbo:Place .
-              ?place foaf:name ?title .
-              ?place geo:lat ?geolat .
-              ?place geo:long ?geolong .
-              ?place prov:wasDerivedFrom ?wikiurl .
-              ?place dbo:country ?country .
-            }
-            OFFSET """ + str(offset) + """
-            LIMIT """ + str(RESULTS_QUERY)+ """
-            """)
-
+try:
+    while query_results > 0:
+        if islive:
+        	sparql.setQuery("""
+        	    SELECT ?title,?geolat,?geolong, ?country, ?wikiurl
+        	    WHERE{
+        	      ?place rdf:type dbo:Place .
+        	      ?place foaf:name ?title .
+        	      ?place geo:lat ?geolat .
+        	      ?place geo:long ?geolong .
+                      ?place dbo:wikiPageRevisionLink ?wikiurl .
+        	      ?place dbo:country ?country .
+        	    }
+        	    OFFSET """ + str(offset) + """
+        	    LIMIT """ + str(RESULTS_QUERY)+ """
+        	    """)
+        
+        else:
+        	sparql.setQuery("""
+        	    SELECT ?title,?geolat,?geolong, ?country, ?wikiurl
+        	    WHERE{
+        	      ?place rdf:type dbo:Place .
+        	      ?place foaf:name ?title .
+        	      ?place geo:lat ?geolat .
+        	      ?place geo:long ?geolong .
+        	      ?place prov:wasDerivedFrom ?wikiurl .
+        	      ?place dbo:country ?country .
+        	    }
+        	    OFFSET """ + str(offset) + """
+        	    LIMIT """ + str(RESULTS_QUERY)+ """
+        	    """)
+        
         results_array = sparql.query().convert()
         for result in results_array["results"]["bindings"]:
-            OF.write(result["title"]["value"].encode("utf-8") +
-                    result["country"]["value"].encode("utf-8") +
-                    result["wikiurl"]["value"].encode("utf-8") +
-                    result["geolat"]["value"].encode("utf-8") +
-                    result["geolong"]["value"].encode("utf-8") +
+            OF.write(result["title"]["value"] +
+                    result["country"]["value"] +
+                    result["wikiurl"]["value"] +
+                    result["geolat"]["value"] +
+                    result["geolong"]["value"] +
                     ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n"
                     )
-
+    
         query_results = len(results_array["results"]["bindings"])
         offset = offset + query_results
         total_results += query_results
         S.set_count(total_results) #set spinner count
+    
+        #except Exception as inst:
+        #    #If exception happens, I assume is a network problem exception. Wait 5 minutes and retry
+        #    sys.stdout.write("\r\x1b[K"+str(inst))
+        #    wait_to_continue()
+finally:
 
-    except Exception as inst:
-        #If exception happens, I assume is a network problem exception. Wait 5 minutes and retry
-        sys.stdout.write("\r\x1b[K"+str(inst))
-        print
-        wait_to_continue()
-
-############################
-#
-#  CLOSURE
-#
-############################
-print "Program Finished"
-finish_program()
+    ############################
+    #
+    #  CLOSURE
+    #
+    ############################
+    print "Program Finished"
+    finish_program()
