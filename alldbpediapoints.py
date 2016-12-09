@@ -161,7 +161,7 @@ print "Counting total entries"
 S.set_total(get_total_dbpedia_points(islive));
 S.start()
 
-header = "name;country;URL;WKT\n"
+header = "name;country;URL;x;y;WKT\n"
 OF.write(header)
 
 total_results = 0
@@ -189,6 +189,8 @@ while query_results > 0:
             OF.write(result["title"]["value"].encode("utf-8") +
                     result["country"]["value"].encode("utf-8") +
                     result["wikiurl"]["value"].encode("utf-8") +
+                    result["geolat"]["value"].encode("utf-8") +
+                    result["geolong"]["value"].encode("utf-8") +
                     ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n"
                     )
 
