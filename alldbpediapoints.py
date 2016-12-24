@@ -204,12 +204,12 @@ try:
         
         results_array = sparql.query().convert()
         for result in results_array["results"]["bindings"]:
-            OF.write(result["title"]["value"] +
-                    result["country"]["value"] +
-                    result["wikiurl"]["value"] +
-                    result["geolat"]["value"] +
-                    result["geolong"]["value"] +
-                    ";POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n"
+            OF.write(result["title"]["value"] + ";" +
+                    result["country"]["value"] + ";" +
+                    result["wikiurl"]["value"] + ";" +
+                    result["geolat"]["value"] + ";" +
+                    result["geolong"]["value"] + ";" +
+                    "POINT(" + result["geolong"]["value"] +" "+ result["geolat"]["value"] +");" + "\n"
                     )
     
         query_results = len(results_array["results"]["bindings"])
