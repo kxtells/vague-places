@@ -1,6 +1,5 @@
 """
- Batch Shape Generator
- Vagueplaces Generator
+ Batch dbpedia country point files generator
  \author Jordi Castells
  \date 8 December 2016
 
@@ -37,8 +36,8 @@ import geom_functions as GEOM
 parser = argparse.ArgumentParser(description='Filter an input dataset into smaller files (by country)')
 
 
-parser.add_argument('--outDir', default=None, dest='outDir',help='Directory where to store the alpha shape outputs')
-parser.add_argument('--pointFile', default=None, dest='points',help='input file with points to alpha shape')
+parser.add_argument('--outDir', default=None, dest='outDir',help='Directory where to store the country points outputs')
+parser.add_argument('--pointFile', default=None, dest='points',help='input file with points to split in smaller files')
 
 parser.add_argument('--nospinner', default=False, dest='nospinner',help='Deactivate live feedback via shell. For batch operations', action="store_true")
 #parser.add_argument('--country', default=None, dest='countryFilter', help='Filter by country')
@@ -151,6 +150,7 @@ def extract_countries_to_files(filename, outdir, countryNames):
     for countryName in countryNames:
         fileout = os.path.join(args.outDir, "%s_points.csv" % slugify(countryName))
         handle = open(fileout, 'wb')
+        handle.write("name;country;wikipediaURL;x;y;WKT\n")
     	pwriter = csv.writer(handle, delimiter=';', quotechar='"')
         fileHandles[countryName] = [handle, pwriter]
 
